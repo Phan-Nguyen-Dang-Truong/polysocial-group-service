@@ -5,8 +5,6 @@ import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.context.annotation.Bean;
 
-import com.polysocial.service.impl.GroupServiceImpl;
-
 @SpringBootApplication
 public class GroupApplication {
 
@@ -15,11 +13,6 @@ public class GroupApplication {
         return new ModelMapper();
     }
 
-    @Bean
-    public GroupServiceImpl groupServiceImpl() {
-    	return new GroupServiceImpl();
-    }
-    
     public static void main(String[] args) {
         SpringApplication.run(GroupApplication.class, args);
     }
