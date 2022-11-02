@@ -1,73 +1,196 @@
 package com.polysocial.rest.controller;
 
 import com.polysocial.consts.GroupAPI;
-import com.polysocial.dao.GroupDAO;
-import com.polysocial.dao.MemberDAO;
-import com.polysocial.dao.UserDAO;
 import com.polysocial.dto.GroupDTO;
-import com.polysocial.entity.Group;
-import com.polysocial.entity.Member;
-import com.polysocial.entity.User;
-import com.polysocial.service.PostService;
+import com.polysocial.entity.Groups;
+import com.polysocial.entity.Members;
+import com.polysocial.entity.Users;
+import com.polysocial.repository.GroupRepository;
+import com.polysocial.repository.MemberRepository;
+import com.polysocial.repository.UserRepository;
+import com.polysocial.service.GroupService;
+import com.polysocial.service.impl.GroupServiceImpl;
 
+import java.io.IOException;
 import java.util.List;
 import java.util.Optional;
 
 import javax.websocket.server.PathParam;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.http.ResponseEntity;
+import org.springframework.http.ResponseEntity.BodyBuilder;
+import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.RequestPart;
 import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.multipart.MultipartFile;
 
 @RestController
 public class GroupController {
+	
+    @Autowired
+	private GroupServiceImpl groupBusiness = new GroupServiceImpl();
+	
 
-    @Autowired
-    private PostService postService;
+    @GetMapping("/api/get/all")
+    public ResponseEntity getAll(@RequestParam Integer page, @RequestParam Integer limit){
+    	try {
+    		Pageable pageable = PageRequest.of(page, limit);
+    		Page<Groups> list = groupBusiness.getAll(pageable);
+    		return ResponseEntity.ok(list);
+    	}catch(Exception e) {
+    		return null;
+    	}
+    	
+    }
     
-    @Autowired
-    private GroupDAO groupDao;
+    @GetMapping("/api/get/class")
+    public ResponseEntity getOne(@RequestParam Long groupId){
+    	try {
+    		Groups group = groupBusiness.getOne(groupId);
+    		return ResponseEntity.ok(group);
+    	}catch(Exception e) {
+    		e.printStackTrace();
+    		return null;
+    	}
+    	
+    }
     
-    @Autowired
-    private UserDAO userDao;
+    @PostMapping("/api/create-group")
+    public ResponseEntity createGroup(@RequestBody Groups group) {
+    	try {
+    		Object o =  groupBusiness.createGroup(group);
+    		return ResponseEntity.ok(o);
+    	}catch(Exception e) {
+    		return null;
+    	}
+    	
+    }
     
-    @Autowired
-    private MemberDAO memberDao;
+    @PutMapping("/api/update-group")
+	public ResponseEntity updateGroup(@RequestBody Groups group) {
+		try {
+			if(group.getGroupId() == null) return null;
+			Object o = groupBusiness.createGroup(group);
+			return ResponseEntity.ok(o);
+		}catch(Exception e) {
+			return null;
+		}
+	}
+    
+    @GetMapping("/api/get-teacher")
+    public ResponseEntity getTeacherFromGroup(@RequestParam Long groupId) {
+    	try{
+    		Object object = groupBusiness.getTeacherFromGroup(groupId);
+    		return ResponseEntity.ok(object);
+    	}catch(Exception e) {
+    		return null;
+    	}
+    }
+    
+    @GetMapping("/api/get/all-student")
+    public ResponseEntity getStudentByIdClass(@RequestParam Long groupId){
+    	try {
+    		List<Members> list = groupBusiness.getMemberInGroup(groupId);
+    		return ResponseEntity.ok(list);
+    	}catch(Exception e) {
+    		return null;
+    	}
+    	
+    }
+    
+    @GetMapping("/api/get-student")
+    public ResponseEntity getUserInGroup(@RequestParam String email, @RequestParam Long groupId ) {
+    	try {
+    		Users user =  groupBusiness.getOneMemberInGroup(email, groupId);
+    		return ResponseEntity.ok(user);
+    	}catch(Exception e) {
+    		return null;
+    	}
+    }
+    
+    @PostMapping("/api/create-student")
+    public ResponseEntity createStudentGroup(@RequestParam Long userId, @RequestParam Long groupId) {
+    	try {
+    		Members member = groupBusiness.saveMember(userId, groupId);
+    		return ResponseEntity.ok(member);
+    	}catch(Exception e) {
+    		return null;
+    	}
+    }
+    
+    @GetMapping("/api/find-group")
+    public ResponseEntity findGroup(@RequestParam(required = false, name="keywork")	 String keyword){
+    	try {
+    		List<Groups> list = groupBusiness.findByKeywork(keyword);
+    		return ResponseEntity.ok(list);
+    	}catch(Exception e) {
+    		return null;
+    	}
+    }
+    
+	@DeleteMapping("/api/delete-group")
+	public ResponseEntity deleteGroup(@RequestParam Long groupId) {
+		try {
+			groupBusiness.deleteGroup(groupId);
+			return (ResponseEntity) ResponseEntity.ok();
+		}catch(Exception e) {
+			return null;
+		}
+	}
+    
+    @DeleteMapping("/api/remove-student")
+    public ResponseEntity removeStudentToClass(@RequestParam Long groupId, @RequestParam Long userId){
+    	try {
+        	groupBusiness.deleteMemberToGroup(groupId, userId);
+        	return (ResponseEntity) ResponseEntity.ok();
+    	}catch(Exception e) {
+    		return null;
+    	}
+    }	
+    
+    
+	@PostMapping("/api/create-file")
+	public ResponseEntity<Object> uploadFile(@RequestParam MultipartFile file)
+			throws IOException {
+		try {
+			groupBusiness.createExcel(file);
+			return ResponseEntity.ok("OK");
+		}catch(Exception e) {
+			return null;
+		}
+	}
 
-    @GetMapping(GroupAPI.API_GET_GROUP)
-    public GroupDTO getGroup(){
-        GroupDTO response = postService.getPost();
-        return response;
-    }
-    @GetMapping(GroupAPI.API_GET_ALL_GROUP)
-    public List<Group> getAll(){
-    	return postService.getAll();
-    }
-    
-    @GetMapping(GroupAPI.API_GET_ONE+"/{id}")
-    public Group getOne(@PathVariable("id") Integer id){
-    	return postService.getOne(id);
-    }
-    
-    @GetMapping("/test/{id}")
-    public List<Member> getTest(@PathVariable("id")Integer groupId){
-    	return groupDao.getMemberInGroup(groupId);
-    }
-    
-    @GetMapping("/")
-    public String getT(){
-    	return "index";
-    }
-    
-    @PostMapping("/save/{groupid}/{userid}")
-    public void save(@PathVariable("groupid")Integer groupId, @PathVariable("userid") Integer userId) {
-    	User user = userDao.findById(userId).get();
-    	Group group = groupDao.findById(groupId).get();
-    	Member member = new Member(4,user, group, false);
-    	memberDao.save(member);
-    }
-
+	@GetMapping("/api/get-all/group/student")
+	public ResponseEntity getAllGroupStudent(@RequestParam Long userId) {
+		try {
+			List<Members> list = groupBusiness.getAllGroupByStudent(userId);
+			return ResponseEntity.ok(list);
+		}catch(Exception e) {
+			return null;
+		}
+	}
+	
+	@GetMapping("/api/get-all/group/teacher")
+	public ResponseEntity getAllGroupTeacher(@RequestParam Long userId) {
+		try {
+			List<Members> list = groupBusiness.getAllGroupByTeacher(userId);
+			return ResponseEntity.ok(list);
+		}catch(Exception e) {
+			return null;
+		}
+	}
+	
+	
+        
 }
