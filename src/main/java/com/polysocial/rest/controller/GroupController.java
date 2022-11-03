@@ -21,6 +21,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.http.ResponseEntity.BodyBuilder;
 import org.springframework.web.bind.annotation.DeleteMapping;
@@ -30,6 +31,9 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestHeader;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RequestPart;
 import org.springframework.web.bind.annotation.RestController;
@@ -41,8 +45,7 @@ public class GroupController {
     @Autowired
 	private GroupServiceImpl groupBusiness = new GroupServiceImpl();
 	
-
-    @GetMapping("/api/get/all")
+    @GetMapping(GroupAPI.API_GET_ALL_GROUP)
     public ResponseEntity getAll(@RequestParam Integer page, @RequestParam Integer limit){
     	try {
     		Pageable pageable = PageRequest.of(page, limit);
@@ -54,7 +57,7 @@ public class GroupController {
     	
     }
     
-    @GetMapping("/api/get/class")
+    @GetMapping(GroupAPI.API_GET_ONE_GROUP)
     public ResponseEntity getOne(@RequestParam Long groupId){
     	try {
     		Groups group = groupBusiness.getOne(groupId);
@@ -66,7 +69,7 @@ public class GroupController {
     	
     }
     
-    @PostMapping("/api/create-group")
+    @PostMapping(GroupAPI.API_CREATE_GROUP)
     public ResponseEntity createGroup(@RequestBody Groups group) {
     	try {
     		Object o =  groupBusiness.createGroup(group);
@@ -77,7 +80,7 @@ public class GroupController {
     	
     }
     
-    @PutMapping("/api/update-group")
+    @PutMapping(GroupAPI.API_UPDATE_GROUP)
 	public ResponseEntity updateGroup(@RequestBody Groups group) {
 		try {
 			if(group.getGroupId() == null) return null;
@@ -88,7 +91,7 @@ public class GroupController {
 		}
 	}
     
-    @GetMapping("/api/get-teacher")
+    @GetMapping(GroupAPI.API_GET_TEACHER)
     public ResponseEntity getTeacherFromGroup(@RequestParam Long groupId) {
     	try{
     		Object object = groupBusiness.getTeacherFromGroup(groupId);
@@ -98,7 +101,7 @@ public class GroupController {
     	}
     }
     
-    @GetMapping("/api/get/all-student")
+    @GetMapping(GroupAPI.API_GET_ALL_STUDENT)
     public ResponseEntity getStudentByIdClass(@RequestParam Long groupId){
     	try {
     		List<Members> list = groupBusiness.getMemberInGroup(groupId);
@@ -109,7 +112,7 @@ public class GroupController {
     	
     }
     
-    @GetMapping("/api/get-student")
+    @GetMapping(GroupAPI.API_GET_STUDENT)
     public ResponseEntity getUserInGroup(@RequestParam String email, @RequestParam Long groupId ) {
     	try {
     		Users user =  groupBusiness.getOneMemberInGroup(email, groupId);
@@ -119,7 +122,7 @@ public class GroupController {
     	}
     }
     
-    @PostMapping("/api/create-student")
+    @PostMapping(GroupAPI.API_CREATE_STUDENT)
     public ResponseEntity createStudentGroup(@RequestParam Long userId, @RequestParam Long groupId) {
     	try {
     		Members member = groupBusiness.saveMember(userId, groupId);
@@ -129,7 +132,7 @@ public class GroupController {
     	}
     }
     
-    @GetMapping("/api/find-group")
+    @GetMapping(GroupAPI.API_FIND_GROUP)
     public ResponseEntity findGroup(@RequestParam(required = false, name="keywork")	 String keyword){
     	try {
     		List<Groups> list = groupBusiness.findByKeywork(keyword);
@@ -139,7 +142,7 @@ public class GroupController {
     	}
     }
     
-	@DeleteMapping("/api/delete-group")
+	@DeleteMapping(GroupAPI.API_DELETE_GROUP)
 	public ResponseEntity deleteGroup(@RequestParam Long groupId) {
 		try {
 			groupBusiness.deleteGroup(groupId);
@@ -149,7 +152,7 @@ public class GroupController {
 		}
 	}
     
-    @DeleteMapping("/api/remove-student")
+    @DeleteMapping(GroupAPI.API_REMOVE_STUDENT)
     public ResponseEntity removeStudentToClass(@RequestParam Long groupId, @RequestParam Long userId){
     	try {
         	groupBusiness.deleteMemberToGroup(groupId, userId);
@@ -160,7 +163,7 @@ public class GroupController {
     }	
     
     
-	@PostMapping("/api/create-file")
+	@RequestMapping(value = GroupAPI.API_CREATE_GROUP_EXCEL, headers = "content-type=multipart/*", method = RequestMethod.POST)
 	public ResponseEntity<Object> uploadFile(@RequestParam MultipartFile file)
 			throws IOException {
 		try {
@@ -171,7 +174,7 @@ public class GroupController {
 		}
 	}
 
-	@GetMapping("/api/get-all/group/student")
+	@GetMapping(GroupAPI.API_GET_ALL_GROUP_STUDENT)
 	public ResponseEntity getAllGroupStudent(@RequestParam Long userId) {
 		try {
 			List<Members> list = groupBusiness.getAllGroupByStudent(userId);
@@ -181,7 +184,7 @@ public class GroupController {
 		}
 	}
 	
-	@GetMapping("/api/get-all/group/teacher")
+	@GetMapping(GroupAPI.API_GET_ALL_GROUP_TEACHER)
 	public ResponseEntity getAllGroupTeacher(@RequestParam Long userId) {
 		try {
 			List<Members> list = groupBusiness.getAllGroupByTeacher(userId);
