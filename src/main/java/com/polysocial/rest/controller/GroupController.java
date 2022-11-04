@@ -145,8 +145,8 @@ public class GroupController {
 	@DeleteMapping(GroupAPI.API_DELETE_GROUP)
 	public ResponseEntity deleteGroup(@RequestParam Long groupId) {
 		try {
-			groupBusiness.deleteGroup(groupId);
-			return (ResponseEntity) ResponseEntity.ok();
+			Groups group = groupBusiness.deleteGroup(groupId);
+			return ResponseEntity.ok(group);
 		}catch(Exception e) {
 			return null;
 		}
@@ -156,20 +156,20 @@ public class GroupController {
     public ResponseEntity removeStudentToClass(@RequestParam Long groupId, @RequestParam Long userId){
     	try {
         	groupBusiness.deleteMemberToGroup(groupId, userId);
-        	return (ResponseEntity) ResponseEntity.ok();
+        	return ResponseEntity.ok("OK");
     	}catch(Exception e) {
     		return null;
     	}
     }	
     
-    
-	@RequestMapping(value = GroupAPI.API_CREATE_GROUP_EXCEL, headers = "content-type=multipart/*", method = RequestMethod.POST)
-	public ResponseEntity<Object> uploadFile(@RequestParam MultipartFile file)
+	@RequestMapping(value = GroupAPI.API_CREATE_GROUP_EXCEL, method = RequestMethod.POST)
+	public ResponseEntity uploadFile(@RequestParam MultipartFile file)
 			throws IOException {
 		try {
 			groupBusiness.createExcel(file);
 			return ResponseEntity.ok("OK");
 		}catch(Exception e) {
+			e.printStackTrace();
 			return null;
 		}
 	}

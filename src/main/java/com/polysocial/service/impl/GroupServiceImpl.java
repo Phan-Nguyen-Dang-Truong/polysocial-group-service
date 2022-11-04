@@ -61,8 +61,9 @@ public class GroupServiceImpl implements GroupService {
 	}
 
 	@Override
-	public void deleteMemberToGroup(Long groupdId, Long userId) {
-		memberRepo.removeUserToGroup(groupdId, userId);;
+	public String deleteMemberToGroup(Long groupdId, Long userId) {
+		memberRepo.removeUserToGroup(groupdId, userId);
+		return null;
 	}
 
 	@Override
@@ -104,8 +105,7 @@ public class GroupServiceImpl implements GroupService {
 	public void createExcel(MultipartFile multipartFile) throws IOException {
 		ExcelService excel = new ExcelService();
 		HashMap<Integer, Users> map = new HashMap();
-//		long size = multipartFile.getSize();
-		String filecode = FileUploadUtil.saveFile("student_in_class.xlsx", multipartFile);
+		FileUploadUtil.saveFile("student_in_class.xlsx", multipartFile);
 		String excelFilePath = "./Files/student_in_class.xlsx";
 		Long userId = (long) 1;
 		String groupName = "";
@@ -127,10 +127,11 @@ public class GroupServiceImpl implements GroupService {
 	}
 
 	@Override
-	public void deleteGroup(Long groupId) {
+	public Groups deleteGroup(Long groupId) {
 		Groups group = groupRepo.findById(groupId).get();
 		group.setStatus(false);
 		groupRepo.save(group);
+		return group;
 	}
 
 	@Override

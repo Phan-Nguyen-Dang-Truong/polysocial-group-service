@@ -9,11 +9,12 @@ import org.springframework.transaction.annotation.Transactional;
 
 import com.polysocial.entity.Members;
 
+
 public interface MemberRepository extends JpaRepository<Members, Long>{
 	@Transactional
 	@Modifying
 	@Query("DELETE FROM Members o WHERE o.groupId =?1 and o.userId =?2")
-	void removeUserToGroup(Long groupId, Long userId);
+	Members removeUserToGroup(Long groupId, Long userId);
 	
 	@Query("SELECT o FROM Members o WHERE o.groupId =?1 and isTeacher like 1")
 	Object getTeacherFromGroup(Long groupId);

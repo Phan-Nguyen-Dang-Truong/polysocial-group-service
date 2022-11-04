@@ -23,9 +23,9 @@ public interface GroupService {
     
     void addMemberToGroup(Users user, Groups group);
     
-    void deleteMemberToGroup(Long groupId, Long userId);
+    String deleteMemberToGroup(Long groupId, Long userId);
     
-    void deleteGroup(Long groupId);
+    Groups deleteGroup(Long groupId);
     
     Object getTeacherFromGroup(Long groupId);
     

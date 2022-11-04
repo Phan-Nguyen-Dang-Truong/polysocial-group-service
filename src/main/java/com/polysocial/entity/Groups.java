@@ -36,6 +36,8 @@ public class Groups implements Serializable {
 		this.totalMember = totalMember;
 	}
 
+    @OneToMany(mappedBy = "group")
+    private List<Exercises> exercises;
     
     @Override
     public boolean equals(Object o) {
