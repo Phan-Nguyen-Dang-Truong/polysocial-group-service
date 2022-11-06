@@ -14,6 +14,7 @@ import java.util.Objects;
 @AllArgsConstructor
 @RequiredArgsConstructor
 @Entity
+
 public class Groups implements Serializable {
 
 	@Id

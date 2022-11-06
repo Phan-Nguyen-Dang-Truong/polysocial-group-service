@@ -32,4 +32,6 @@ public class GroupAPI {
     public static final String API_GET_ALL_GROUP_STUDENT = "/api/get-all/group/student";
     
     public static final String API_GET_ALL_GROUP_TEACHER = "/api/get-all/group/teacher";
+
+    public static final String API_GET_ALL_GROUP_FALSE = "/api/get-all/group/false";
 }

@@ -10,6 +10,7 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.polysocial.entity.Groups;
 import com.polysocial.entity.Members;
 @Transactional
@@ -27,5 +28,9 @@ public interface GroupRepository extends JpaRepository<Groups, Long> {
 	@Modifying
 	@Query("UPDATE FROM Groups o SET o.name =?1 , o.totalMember =?2 , o.description =?3 WHERE o.groupId =?4")
 	void updateGroup(String name, Integer totalMember, String description, Long groupId);
+
+	// select group by status false
+	@Query("SELECT o FROM Groups o WHERE o.status = 0")
+	Page<Groups> getAllGroupFalse(Pageable page);
 }
 

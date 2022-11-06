@@ -11,6 +11,8 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.multipart.MultipartFile;
 
 import com.polysocial.dto.GroupDTO;
+import com.polysocial.dto.MemberDTO;
+import com.polysocial.dto.UserDTO;
 import com.polysocial.entity.Groups;
 import com.polysocial.entity.Members;
 import com.polysocial.entity.Users;
@@ -19,39 +21,37 @@ public interface GroupService {
     
     Page<Groups> getAll(Pageable page);
     
-    Groups getOne(Long id);
+    GroupDTO getOne(Long id);
     
     void addMemberToGroup(Users user, Groups group);
     
-    String deleteMemberToGroup(Long groupId, Long userId);
+    void deleteMemberToGroup(Long groupId, Long userId);
     
-    Groups deleteGroup(Long groupId);
+    GroupDTO deleteGroup(Long groupId);
     
     Object getTeacherFromGroup(Long groupId);
     
     Integer getUserId(String email);
     
-    Groups createGroup(Groups group);
+    GroupDTO createGroup(Groups group);
     
-    Users getOneMemberInGroup(String email, Long groupId);
+    UserDTO getOneMemberInGroup(String email, Long groupId);
     
-    List<Members> getMemberInGroup(Long id);
-    
-    List<Groups> findByGroupName(String name);
-    
-    Users getUserById(Long userId);
-    
+    List<MemberDTO> getMemberInGroup(Long id);
+            
     void updateGroup(String name, Integer totalMember, String description, Long groupId);
     
     void createExcel(MultipartFile multipartFile) throws IOException;
     
-    List<Groups> findByKeywork(String keywork);
+    List<GroupDTO> findByKeywork(String keywork);
     
-    Members saveMember(Long userId, Long groupId);
+    MemberDTO saveMember(Long userId, Long groupId);
     
     List<Members> getAllGroupByStudent(Long userId);
     
     List<Members> getAllGroupByTeacher(Long userId);
+
+    Page<Groups> getAllGroupFalse(Pageable page);
     
             
 }

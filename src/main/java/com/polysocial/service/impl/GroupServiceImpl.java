@@ -1,10 +1,11 @@
 package com.polysocial.service.impl;
 
 import com.polysocial.dto.GroupDTO;
+import com.polysocial.dto.MemberDTO;
+import com.polysocial.dto.UserDTO;
 import com.polysocial.entity.Book;
 import com.polysocial.entity.Groups;
 import com.polysocial.entity.Members;
-import com.polysocial.entity.Post;
 import com.polysocial.entity.Users;
 import com.polysocial.repository.GroupRepository;
 import com.polysocial.repository.MemberRepository;
@@ -12,36 +13,30 @@ import com.polysocial.repository.UserRepository;
 import com.polysocial.service.ExcelService;
 import com.polysocial.service.FileUploadUtil;
 import com.polysocial.service.GroupService;
-import com.polysocial.utils.Logger;
 
 import java.io.IOException;
 import java.util.HashMap;
-import java.util.Iterator;
 import java.util.List;
-import java.util.Optional;
+import java.util.stream.Collectors;
 
-import org.apache.catalina.connector.Response;
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
-import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
-import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
 @Service
 public class GroupServiceImpl implements GroupService {
 
-    @Autowired
-    private ModelMapper modelMapper;
-    @Autowired
-    private GroupRepository groupRepo;
-    @Autowired
-    private MemberRepository memberRepo;
-    @Autowired
-    private UserRepository userRepo;
-    
+	@Autowired
+	private ModelMapper modelMapper;
+	@Autowired
+	private GroupRepository groupRepo;
+	@Autowired
+	private MemberRepository memberRepo;
+	@Autowired
+	private UserRepository userRepo;
 
 	@Override
 	public Page<Groups> getAll(Pageable page) {
@@ -49,21 +44,22 @@ public class GroupServiceImpl implements GroupService {
 	}
 
 	@Override
-	public Groups getOne(Long id) {
-		return groupRepo.getGroup(id);
+	public GroupDTO getOne(Long id) {
+		Groups group = groupRepo.getGroup(id);
+		GroupDTO groupDTO = modelMapper.map(group, GroupDTO.class);
+		return groupDTO;
 	}
 
 	@Override
 	public void addMemberToGroup(Users user, Groups group) {
 		Members member = new Members(user.getUserId(), group.getGroupId(), false);
 		memberRepo.save(member);
-		
+
 	}
 
 	@Override
-	public String deleteMemberToGroup(Long groupdId, Long userId) {
+	public void deleteMemberToGroup(Long groupdId, Long userId) {
 		memberRepo.removeUserToGroup(groupdId, userId);
-		return null;
 	}
 
 	@Override
@@ -73,27 +69,21 @@ public class GroupServiceImpl implements GroupService {
 
 	@Override
 	public Integer getUserId(String email) {
-		return userRepo.getUserId(email);
+		return userRepo.getIdUserByEmail(email);
 	}
 
 	@Override
-	public Groups createGroup(Groups group) {
-		return groupRepo.save(group);
+	public GroupDTO createGroup(Groups group) {
+		Groups groupEntity = groupRepo.save(group);
+		GroupDTO groupDTO = modelMapper.map(groupEntity, GroupDTO.class);
+		return groupDTO;
 	}
 
 	@Override
-	public List<Members> getMemberInGroup(Long id) {
-		return memberRepo.getMemberInGroup(id);
-	}
-
-	@Override
-	public List<Groups> findByGroupName(String name) {
-		return groupRepo.findByGroupName(name);
-	}
-
-	@Override
-	public Users getUserById(Long userId) {
-		return userRepo.findById(userId).get();
+	public List<MemberDTO> getMemberInGroup(Long id) {
+		List<Members> listMember =  memberRepo.getMemberInGroup(id);
+		List<MemberDTO> listMemberDTO = listMember.stream().map(member -> modelMapper.map(member, MemberDTO.class)).collect(Collectors.toList());
+		return listMemberDTO;
 	}
 
 	@Override
@@ -110,47 +100,54 @@ public class GroupServiceImpl implements GroupService {
 		Long userId = (long) 1;
 		String groupName = "";
 		List<Book> books = excel.readExcel(excelFilePath);
-		for (int i = 0; i < books.size()-1; i++) {
-			userId = Long.parseLong(userRepo.getUserId(books.get(i).getEmail())+"");
+		for (int i = 0; i < books.size() - 1; i++) {
+			userId = Long.parseLong(userRepo.getIdUserByEmail(books.get(i).getEmail()) + "");
 			map.put(i, userRepo.findById(userId).get());
 		}
 
 		groupName = books.get(0).getGroupName();
-		Groups group = new Groups(groupName, Long.parseLong(map.size()+""));
+		Groups group = new Groups(groupName, Long.parseLong(map.size() + ""));
 		groupRepo.save(group);
 		map.entrySet().forEach(entry -> {
 			Users user = entry.getValue();
 			Members member = new Members(user.getUserId(), group.getGroupId(), false);
 			memberRepo.save(member);
 		});
-		
+
 	}
 
 	@Override
-	public Groups deleteGroup(Long groupId) {
+	public GroupDTO deleteGroup(Long groupId) {
 		Groups group = groupRepo.findById(groupId).get();
 		group.setStatus(false);
 		groupRepo.save(group);
-		return group;
+		GroupDTO groupDTO = modelMapper.map(group, GroupDTO.class);
+		return groupDTO;
 	}
 
 	@Override
-	public List<Groups> findByKeywork(String keywork) {
-		return groupRepo.findByGroupName(keywork);
+	public List<GroupDTO> findByKeywork(String keywork) {
+		List<Groups> groups = groupRepo.findByGroupName(keywork);
+		List<GroupDTO> groupDTO = groups.stream().map(group -> modelMapper.map(group, GroupDTO.class))
+				.collect(Collectors.toList());
+		return groupDTO;
 	}
 
 	@Override
-	public Users getOneMemberInGroup(String email, Long groupId) {
-		Long userId = (long)userRepo.getUserId(email);
-		Members member = memberRepo.getOneMemberInGroup(userId, groupId);
-		return userRepo.findById(member.getUserId()).get();
-	}	
+	public UserDTO getOneMemberInGroup(String email, Long groupId) {
+		Long userId = (long) userRepo.getIdUserByEmail(email);
+		memberRepo.getOneMemberInGroup(userId, groupId);
+		Users users = userRepo.findById(userId).get();
+		UserDTO userDTO = modelMapper.map(users, UserDTO.class);
+		return userDTO;
+	}
 
 	@Override
-	public Members saveMember(Long userId, Long groupId) {
-	    	Members member = new Members(userId, groupId, false);
-	    	return memberRepo.save(member);
-		
+	public MemberDTO saveMember(Long userId, Long groupId) {
+		Members member = new Members(userId, groupId, false);
+		MemberDTO memberDTO = modelMapper.map(memberRepo.save(member), MemberDTO.class);
+		return memberDTO;
+
 	}
 
 	@Override
@@ -163,6 +160,11 @@ public class GroupServiceImpl implements GroupService {
 	public List<Members> getAllGroupByTeacher(Long userId) {
 		List<Members> list = memberRepo.getAllGroupByTeacher(userId);
 		return list;
-	}	
-	
+	}
+
+	@Override
+	public Page<Groups> getAllGroupFalse(Pageable page) {
+		return groupRepo.getAllGroupFalse(page);
+	}
+
 }

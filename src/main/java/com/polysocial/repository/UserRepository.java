@@ -9,6 +9,6 @@ import com.polysocial.entity.Users;
 public interface UserRepository extends JpaRepository<Users, Long>{
 
 	@Query("SELECT o.userId FROM Users o WHERE o.email =?1")
-	Integer getUserId(String email);
+	Integer getIdUserByEmail(String email);
 	
 }

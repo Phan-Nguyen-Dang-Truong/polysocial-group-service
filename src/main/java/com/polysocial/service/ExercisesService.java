@@ -1,12 +1,17 @@
 package com.polysocial.service;
 
+import java.util.List;
+
+import com.polysocial.dto.ExercisesDTO;
 import com.polysocial.entity.Exercises;
 
 public interface ExercisesService {
     
-    Exercises createOne(Exercises exercise);
+    ExercisesDTO createOne(Exercises exercise, Long groupId);
 
-    Exercises updateOne(Long exId, Exercises exercise);
+    ExercisesDTO updateOne(Long exId, Exercises exercise);
 
-    Exercises deleteOne(Long exId, Boolean status);
+    ExercisesDTO deleteOne(Long exId);
+
+    List<ExercisesDTO> getAllExercisesEndDate(Long groupId);
 }

@@ -2,6 +2,8 @@ package com.polysocial.rest.controller;
 
 import com.polysocial.consts.GroupAPI;
 import com.polysocial.dto.GroupDTO;
+import com.polysocial.dto.MemberDTO;
+import com.polysocial.dto.UserDTO;
 import com.polysocial.entity.Groups;
 import com.polysocial.entity.Members;
 import com.polysocial.entity.Users;
@@ -21,24 +23,22 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
-import org.springframework.http.MediaType;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.http.ResponseEntity.BodyBuilder;
+import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.ModelAttribute;
-import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestHeader;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.RequestPart;
+import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.multipart.MultipartFile;
 
+@CrossOrigin(origins = "*", allowedHeaders = "*")
 @RestController
 public class GroupController {
 	
@@ -46,7 +46,8 @@ public class GroupController {
 	private GroupServiceImpl groupBusiness = new GroupServiceImpl();
 	
     @GetMapping(GroupAPI.API_GET_ALL_GROUP)
-    public ResponseEntity getAll(@RequestParam Integer page, @RequestParam Integer limit){
+	@ResponseStatus(HttpStatus.OK)
+    public ResponseEntity<Page> getAll(@RequestParam Integer page, @RequestParam Integer limit){
     	try {
     		Pageable pageable = PageRequest.of(page, limit);
     		Page<Groups> list = groupBusiness.getAll(pageable);
@@ -60,7 +61,7 @@ public class GroupController {
     @GetMapping(GroupAPI.API_GET_ONE_GROUP)
     public ResponseEntity getOne(@RequestParam Long groupId){
     	try {
-    		Groups group = groupBusiness.getOne(groupId);
+    		GroupDTO group = groupBusiness.getOne(groupId);
     		return ResponseEntity.ok(group);
     	}catch(Exception e) {
     		e.printStackTrace();
@@ -104,7 +105,7 @@ public class GroupController {
     @GetMapping(GroupAPI.API_GET_ALL_STUDENT)
     public ResponseEntity getStudentByIdClass(@RequestParam Long groupId){
     	try {
-    		List<Members> list = groupBusiness.getMemberInGroup(groupId);
+    		List<MemberDTO> list = groupBusiness.getMemberInGroup(groupId);
     		return ResponseEntity.ok(list);
     	}catch(Exception e) {
     		return null;
@@ -115,7 +116,7 @@ public class GroupController {
     @GetMapping(GroupAPI.API_GET_STUDENT)
     public ResponseEntity getUserInGroup(@RequestParam String email, @RequestParam Long groupId ) {
     	try {
-    		Users user =  groupBusiness.getOneMemberInGroup(email, groupId);
+    		UserDTO user =  groupBusiness.getOneMemberInGroup(email, groupId);
     		return ResponseEntity.ok(user);
     	}catch(Exception e) {
     		return null;
@@ -125,7 +126,7 @@ public class GroupController {
     @PostMapping(GroupAPI.API_CREATE_STUDENT)
     public ResponseEntity createStudentGroup(@RequestParam Long userId, @RequestParam Long groupId) {
     	try {
-    		Members member = groupBusiness.saveMember(userId, groupId);
+    		MemberDTO member = groupBusiness.saveMember(userId, groupId);
     		return ResponseEntity.ok(member);
     	}catch(Exception e) {
     		return null;
@@ -135,7 +136,7 @@ public class GroupController {
     @GetMapping(GroupAPI.API_FIND_GROUP)
     public ResponseEntity findGroup(@RequestParam(required = false, name="keywork")	 String keyword){
     	try {
-    		List<Groups> list = groupBusiness.findByKeywork(keyword);
+    		List<GroupDTO> list = groupBusiness.findByKeywork(keyword);
     		return ResponseEntity.ok(list);
     	}catch(Exception e) {
     		return null;
@@ -145,7 +146,7 @@ public class GroupController {
 	@DeleteMapping(GroupAPI.API_DELETE_GROUP)
 	public ResponseEntity deleteGroup(@RequestParam Long groupId) {
 		try {
-			Groups group = groupBusiness.deleteGroup(groupId);
+			GroupDTO group = groupBusiness.deleteGroup(groupId);
 			return ResponseEntity.ok(group);
 		}catch(Exception e) {
 			return null;
@@ -158,6 +159,7 @@ public class GroupController {
         	groupBusiness.deleteMemberToGroup(groupId, userId);
         	return ResponseEntity.ok("OK");
     	}catch(Exception e) {
+			e.printStackTrace();
     		return null;
     	}
     }	
@@ -193,7 +195,17 @@ public class GroupController {
 			return null;
 		}
 	}
-	
+
+	@GetMapping(GroupAPI.API_GET_ALL_GROUP_FALSE)
+	public ResponseEntity getAllGroupFalse(@RequestParam Integer page, @RequestParam Integer limit) {
+		try {
+			Pageable pageable = PageRequest.of(page, limit);
+			Page<Groups> list = groupBusiness.getAllGroupFalse(pageable);
+			return ResponseEntity.ok(list);
+		}catch(Exception e) {
+			return null;
+		}
+	}
 	
         
 }

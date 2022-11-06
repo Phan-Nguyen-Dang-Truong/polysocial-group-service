@@ -3,6 +3,10 @@ package com.polysocial.entity;
 import lombok.*;
 
 import javax.persistence.*;
+
+import com.fasterxml.jackson.annotation.JsonFormat;
+import com.fasterxml.jackson.annotation.JsonIgnore;
+
 import java.io.Serializable;
 import java.time.LocalDateTime;
 
@@ -18,13 +22,15 @@ public class Exercises implements Serializable {
 
     private String content;
 
+    @JsonFormat(shape=JsonFormat.Shape.STRING, pattern="yyyy-MM-dd'T'HH:mm:ss")
     private LocalDateTime createdDate = LocalDateTime.now();
 
     private LocalDateTime endDate;
 
     private Boolean status = true;
 
+    @JsonIgnore
     @ManyToOne
-    @JoinColumn(name = "groupId", insertable = false, updatable = false)
+    @JoinColumn(name = "groupId")
     private Groups group;
 }
