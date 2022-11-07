@@ -8,28 +8,49 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import com.polysocial.dto.ExercisesDTO;
+import com.polysocial.dto.TaskExDTO;
 import com.polysocial.entity.Exercises;
-import com.polysocial.repository.ExercisesRepo;
+import com.polysocial.entity.Members;
+import com.polysocial.entity.TaskEx;
+import com.polysocial.repository.ExercisesRepository;
 import com.polysocial.repository.GroupRepository;
+import com.polysocial.repository.MemberRepository;
+import com.polysocial.repository.TaskExRepository;
 import com.polysocial.service.ExercisesService;
 
 @Service
 public class ExercisesServiceImpl implements ExercisesService {
 
     @Autowired
-    private ExercisesRepo exercisesRepo;
+    private ExercisesRepository exercisesRepo;
 
     @Autowired
     private GroupRepository groupRepo;
 
     @Autowired
+    private TaskExRepository taskExRepo;
+
+    @Autowired
     private ModelMapper modelMapper;
+
+    @Autowired
+    private MemberRepository memberRepo;
 
     @Override
     public ExercisesDTO createOne(Exercises exercise, Long groupId) {
         exercise.setGroup(groupRepo.findById(groupId).get());
+        List<Members> listMember = memberRepo.getMemberInGroup(groupId);
         Exercises exercises = exercisesRepo.save(exercise);
+        for(int i = 0; i< listMember.size();i++){
+            TaskExDTO taskExDTO = new TaskExDTO(exercise.getExId(), listMember.get(i).getUserId(), groupId);
+            Members member = new Members(listMember.get(i).getUserId(), groupId, false);
+            TaskEx taskEx = modelMapper.map(taskExDTO, TaskEx.class);
+            taskEx.setMember(member);
+            taskEx.setExercise(exercises);
+            taskExRepo.save(taskEx);
+        }
         ExercisesDTO exercisesDTO = modelMapper.map(exercises, ExercisesDTO.class);
+
         return exercisesDTO ;
     }
 

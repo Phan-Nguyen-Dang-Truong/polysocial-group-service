@@ -13,7 +13,7 @@ import com.polysocial.entity.Exercises;
 
 
 @Repository
-public interface ExercisesRepo extends JpaRepository<Exercises, Long> {
+public interface ExercisesRepository extends JpaRepository<Exercises, Long> {
 
     @Modifying
     @Transactional

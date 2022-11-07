@@ -29,7 +29,6 @@ public interface GroupRepository extends JpaRepository<Groups, Long> {
 	@Query("UPDATE FROM Groups o SET o.name =?1 , o.totalMember =?2 , o.description =?3 WHERE o.groupId =?4")
 	void updateGroup(String name, Integer totalMember, String description, Long groupId);
 
-	// select group by status false
 	@Query("SELECT o FROM Groups o WHERE o.status = 0")
 	Page<Groups> getAllGroupFalse(Pageable page);
 }

@@ -14,4 +14,5 @@ public interface ExercisesService {
     ExercisesDTO deleteOne(Long exId);
 
     List<ExercisesDTO> getAllExercisesEndDate(Long groupId);
+
 }
