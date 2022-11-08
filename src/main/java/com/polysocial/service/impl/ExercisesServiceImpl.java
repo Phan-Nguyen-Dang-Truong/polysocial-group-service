@@ -37,13 +37,14 @@ public class ExercisesServiceImpl implements ExercisesService {
     private MemberRepository memberRepo;
 
     @Override
-    public ExercisesDTO createOne(Exercises exercise, Long groupId) {
-        exercise.setGroup(groupRepo.findById(groupId).get());
-        List<Members> listMember = memberRepo.getMemberInGroup(groupId);
+    public ExercisesDTO createOne(ExercisesDTO ex) {
+        Exercises exercise = modelMapper.map(ex, Exercises.class);
+        exercise.setGroup(groupRepo.findById(ex.getGroupId()).get());
+        List<Members> listMember = memberRepo.getMemberInGroup(exercise.getGroup().getGroupId());
         Exercises exercises = exercisesRepo.save(exercise);
         for(int i = 0; i< listMember.size();i++){
-            TaskExDTO taskExDTO = new TaskExDTO(exercise.getExId(), listMember.get(i).getUserId(), groupId);
-            Members member = new Members(listMember.get(i).getUserId(), groupId, false);
+            TaskExDTO taskExDTO = new TaskExDTO(exercise.getExId(), listMember.get(i).getUserId(), exercise.getGroup().getGroupId());
+            Members member = new Members(listMember.get(i).getUserId(), exercise.getGroup().getGroupId(), false);
             TaskEx taskEx = modelMapper.map(taskExDTO, TaskEx.class);
             taskEx.setMember(member);
             taskEx.setExercise(exercises);
@@ -55,17 +56,20 @@ public class ExercisesServiceImpl implements ExercisesService {
     }
 
     @Override
-    public ExercisesDTO updateOne(Long exId, Exercises exercise) {
-        exercise.setExId(exId);
-        Exercises exercises = exercisesRepo.save(exercise);
-        ExercisesDTO exercisesDTO = modelMapper.map(exercises, ExercisesDTO.class);
+    public ExercisesDTO updateOne (ExercisesDTO exercise) {
+        Exercises exercises = modelMapper.map(exercise, Exercises.class);
+        exercises.setExId(exercise.getExId());
+        ExercisesDTO exercisesDTO = modelMapper.map(exercisesRepo.save(exercises), ExercisesDTO.class);
         return exercisesDTO ;
     }
 
     @Override
     public ExercisesDTO deleteOne(Long exId) {
         exercisesRepo.updatExercisesByStatuExercises(exId);
-        return null;
+        return exercisesRepo.findById(exId).map(exercises -> {
+            ExercisesDTO exercisesDTO = modelMapper.map(exercises, ExercisesDTO.class);
+            return exercisesDTO;
+        }).orElse(null);
     }
 
     @Override

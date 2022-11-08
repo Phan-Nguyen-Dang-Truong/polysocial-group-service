@@ -95,8 +95,8 @@ public class GroupServiceImpl implements GroupService {
 	public void createExcel(MultipartFile multipartFile) throws IOException {
 		ExcelService excel = new ExcelService();
 		HashMap<Integer, Users> map = new HashMap();
-		FileUploadUtil.saveFile("student_in_class.xlsx", multipartFile);
-		String excelFilePath = "./Files/student_in_class.xlsx";
+		FileUploadUtil.saveFile("abc.xlsx", multipartFile);
+		String excelFilePath = "./Files/"+multipartFile.getOriginalFilename();
 		Long userId = (long) 1;
 		String groupName = "";
 		List<Book> books = excel.readExcel(excelFilePath);

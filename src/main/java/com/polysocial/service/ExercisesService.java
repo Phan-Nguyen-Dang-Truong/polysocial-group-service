@@ -7,9 +7,9 @@ import com.polysocial.entity.Exercises;
 
 public interface ExercisesService {
     
-    ExercisesDTO createOne(Exercises exercise, Long groupId);
+    ExercisesDTO createOne(ExercisesDTO exercise);
 
-    ExercisesDTO updateOne(Long exId, Exercises exercise);
+    ExercisesDTO updateOne(ExercisesDTO exercise);
 
     ExercisesDTO deleteOne(Long exId);
 

@@ -2,11 +2,9 @@ package com.polysocial.service.impl;
 
 import java.io.File;
 import java.io.IOException;
-import java.io.InputStream;
-import java.nio.file.Files;
+
 import java.nio.file.Path;
 import java.nio.file.Paths;
-import java.nio.file.StandardCopyOption;
 
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -15,13 +13,12 @@ import org.springframework.web.multipart.MultipartFile;
 
 import com.cloudinary.Cloudinary;
 import com.cloudinary.utils.ObjectUtils;
-import com.polysocial.dto.TaskExDTO;
 import com.polysocial.dto.TaskFileDTO;
-import com.polysocial.entity.FileSave;
 import com.polysocial.entity.TaskEx;
 import com.polysocial.entity.TaskFile;
 import com.polysocial.repository.TaskExRepository;
 import com.polysocial.repository.TaskFileRepository;
+import com.polysocial.service.FileUploadUtil;
 import com.polysocial.service.TaskFileService;
 
 @Service
@@ -57,8 +54,6 @@ public class TaskFileServiceImpl implements TaskFileService {
 			TaskEx taskEx = taskExRepository.findByExIdAndUserIdAndGroupId(exId, userId, groupId);
 			String type = url.substring(url.lastIndexOf(".") + 1);
 			TaskFile taskFile = new TaskFile(url, type, taskEx);
-			// TaskFileDTO taskFileDTO = modelMapper.map(taskFileRepository.save(taskFile),
-			// TaskFileDTO.class);
 			return taskFileRepository.save(taskFile);
 		} catch (IOException e) {
 			e.printStackTrace();
@@ -83,29 +78,15 @@ public class TaskFileServiceImpl implements TaskFileService {
 	}
 
 	public void saveLocal(MultipartFile fi) throws IOException {
-		FileSave file = new FileSave();
-		file.setFile(fi);
-		File f = new File(fi.getOriginalFilename());
-		String type = fi.getContentType(); // check type luc up len server
-		Path uploadPath = Paths.get("Files"); // trỏ toi folder
-		String fName = f.getName(); // lay ra ten file
-		try (InputStream inputStream = fi.getInputStream()) {
-			Path filePath = uploadPath.resolve(fName);
-			Files.copy(inputStream, filePath, StandardCopyOption.REPLACE_EXISTING); // luu file local
-		} catch (IOException ioe) {
-			ioe.printStackTrace();
-			return;
-		}
-
+		FileUploadUtil.saveFile("polysocial.zip", fi);
 	}
 
 	public String upLoadServer(MultipartFile fi) {
 		int firtsIndex = 0;
 		int lastIndex = 0;
 		String url = "";
-		String fileName = fi.getOriginalFilename();
 		try {
-			String json = "" + this.cloudinary.uploader().upload("./Files/" + fileName,
+			String json = "" + this.cloudinary.uploader().upload("./Files/" + "polysocial.zip",
 					ObjectUtils.asMap("resource_type", "auto"));
 			firtsIndex = json.indexOf("url=");
 			lastIndex = json.indexOf("created_at");
