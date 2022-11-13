@@ -1,24 +1,19 @@
 package com.polysocial.rest.controller;
 
 import com.polysocial.consts.GroupAPI;
+import com.polysocial.dto.StudentDTO;
 import com.polysocial.dto.GroupDTO;
 import com.polysocial.dto.MemberDTO;
 import com.polysocial.dto.UserDTO;
 import com.polysocial.entity.Groups;
 import com.polysocial.entity.Members;
-import com.polysocial.entity.Users;
-import com.polysocial.repository.GroupRepository;
-import com.polysocial.repository.MemberRepository;
-import com.polysocial.repository.UserRepository;
-import com.polysocial.service.GroupService;
+
 import com.polysocial.service.impl.GroupServiceImpl;
 
 import java.io.IOException;
 import java.util.List;
-import java.util.Optional;
 
-import javax.websocket.server.PathParam;
-
+import org.apache.tomcat.util.http.parser.MediaType;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
@@ -53,7 +48,7 @@ public class GroupController {
     		Page<Groups> list = groupBusiness.getAll(pageable);
     		return ResponseEntity.ok(list);
     	}catch(Exception e) {
-    		return null;
+    		return new ResponseEntity(HttpStatus.BAD_REQUEST.toString(), HttpStatus.BAD_REQUEST);
     	}
     	
     }
@@ -65,30 +60,31 @@ public class GroupController {
     		return ResponseEntity.ok(group);
     	}catch(Exception e) {
     		e.printStackTrace();
-    		return null;
+    		return new ResponseEntity(HttpStatus.BAD_REQUEST.toString(), HttpStatus.BAD_REQUEST);
     	}
     	
     }
     
     @PostMapping(GroupAPI.API_CREATE_GROUP)
-    public ResponseEntity createGroup(@RequestBody Groups group) {
+    public ResponseEntity createGroup(@RequestBody GroupDTO group) {
     	try {
     		Object o =  groupBusiness.createGroup(group);
     		return ResponseEntity.ok(o);
     	}catch(Exception e) {
-    		return null;
-    	}
+    		return new ResponseEntity(HttpStatus.BAD_REQUEST.toString(), HttpStatus.BAD_REQUEST);
+    	}	
     	
     }
     
     @PutMapping(GroupAPI.API_UPDATE_GROUP)
-	public ResponseEntity updateGroup(@RequestBody Groups group) {
+	public ResponseEntity updateGroup(@RequestBody GroupDTO group) {
 		try {
-			if(group.getGroupId() == null) return null;
+			if(group.getGroupId() == null) return new ResponseEntity(HttpStatus.BAD_REQUEST.toString(), HttpStatus.BAD_REQUEST);
+
 			Object o = groupBusiness.createGroup(group);
 			return ResponseEntity.ok(o);
 		}catch(Exception e) {
-			return null;
+    		return new ResponseEntity(HttpStatus.BAD_REQUEST.toString(), HttpStatus.BAD_REQUEST);
 		}
 	}
     
@@ -98,7 +94,7 @@ public class GroupController {
     		Object object = groupBusiness.getTeacherFromGroup(groupId);
     		return ResponseEntity.ok(object);
     	}catch(Exception e) {
-    		return null;
+    		return new ResponseEntity(HttpStatus.BAD_REQUEST.toString(), HttpStatus.BAD_REQUEST);
     	}
     }
     
@@ -108,7 +104,7 @@ public class GroupController {
     		List<MemberDTO> list = groupBusiness.getMemberInGroup(groupId);
     		return ResponseEntity.ok(list);
     	}catch(Exception e) {
-    		return null;
+    		return new ResponseEntity(HttpStatus.BAD_REQUEST.toString(), HttpStatus.BAD_REQUEST);
     	}
     	
     }
@@ -119,17 +115,18 @@ public class GroupController {
     		UserDTO user =  groupBusiness.getOneMemberInGroup(email, groupId);
     		return ResponseEntity.ok(user);
     	}catch(Exception e) {
-    		return null;
+    		return new ResponseEntity(HttpStatus.BAD_REQUEST.toString(), HttpStatus.BAD_REQUEST);
     	}
     }
     
     @PostMapping(GroupAPI.API_CREATE_STUDENT)
-    public ResponseEntity createStudentGroup(@RequestParam Long userId, @RequestParam Long groupId) {
+    public ResponseEntity createStudentGroup(@RequestBody StudentDTO user) {
     	try {
-    		MemberDTO member = groupBusiness.saveMember(userId, groupId);
+    		MemberDTO member = groupBusiness.saveMember(user);
     		return ResponseEntity.ok(member);
     	}catch(Exception e) {
-    		return null;
+    		return new ResponseEntity(HttpStatus.BAD_REQUEST.toString(), HttpStatus.BAD_REQUEST);
+
     	}
     }
     
@@ -139,32 +136,35 @@ public class GroupController {
     		List<GroupDTO> list = groupBusiness.findByKeywork(keyword);
     		return ResponseEntity.ok(list);
     	}catch(Exception e) {
-    		return null;
+    		return new ResponseEntity(HttpStatus.BAD_REQUEST.toString(), HttpStatus.BAD_REQUEST);
+
     	}
     }
     
-	@DeleteMapping(GroupAPI.API_DELETE_GROUP)
-	public ResponseEntity deleteGroup(@RequestParam Long groupId) {
+	@PostMapping(value = GroupAPI.API_DELETE_GROUP, consumes = "application/json")
+	public ResponseEntity deleteGroup(@RequestBody GroupDTO group) {
 		try {
-			GroupDTO group = groupBusiness.deleteGroup(groupId);
-			return ResponseEntity.ok(group);
+			GroupDTO groups = groupBusiness.deleteGroup(group.getGroupId());
+			return ResponseEntity.ok(groups);
 		}catch(Exception e) {
-			return null;
+			return new ResponseEntity(HttpStatus.BAD_REQUEST.toString(), HttpStatus.BAD_REQUEST);
+
 		}
 	}
     
     @DeleteMapping(GroupAPI.API_REMOVE_STUDENT)
-    public ResponseEntity removeStudentToClass(@RequestParam Long groupId, @RequestParam Long userId){
+    public ResponseEntity removeStudentToClass(@RequestBody StudentDTO student){
     	try {
-        	groupBusiness.deleteMemberToGroup(groupId, userId);
+        	groupBusiness.deleteMemberToGroup(student.getGroupId(), student.getUserId());
         	return ResponseEntity.ok("OK");
     	}catch(Exception e) {
 			e.printStackTrace();
-    		return null;
+    		return new ResponseEntity(HttpStatus.BAD_REQUEST.toString(), HttpStatus.BAD_REQUEST);
+
     	}
     }	
     
-	@RequestMapping(value = GroupAPI.API_CREATE_GROUP_EXCEL, method = RequestMethod.POST)
+	@RequestMapping(value = GroupAPI.API_CREATE_GROUP_EXCEL, method = RequestMethod.POST, consumes = "multipart/form-data")
 	public ResponseEntity uploadFile(@RequestParam MultipartFile file)
 			throws IOException {
 		try {
@@ -172,7 +172,8 @@ public class GroupController {
 			return ResponseEntity.ok("OK");
 		}catch(Exception e) {
 			e.printStackTrace();
-			return null;
+			return new ResponseEntity(HttpStatus.BAD_REQUEST.toString(), HttpStatus.BAD_REQUEST);
+
 		}
 	}
 
@@ -182,7 +183,8 @@ public class GroupController {
 			List<Members> list = groupBusiness.getAllGroupByStudent(userId);
 			return ResponseEntity.ok(list);
 		}catch(Exception e) {
-			return null;
+			return new ResponseEntity(HttpStatus.BAD_REQUEST.toString(), HttpStatus.BAD_REQUEST);
+
 		}
 	}
 	
@@ -192,7 +194,8 @@ public class GroupController {
 			List<Members> list = groupBusiness.getAllGroupByTeacher(userId);
 			return ResponseEntity.ok(list);
 		}catch(Exception e) {
-			return null;
+			return new ResponseEntity(HttpStatus.BAD_REQUEST.toString(), HttpStatus.BAD_REQUEST);
+
 		}
 	}
 
@@ -203,7 +206,8 @@ public class GroupController {
 			Page<Groups> list = groupBusiness.getAllGroupFalse(pageable);
 			return ResponseEntity.ok(list);
 		}catch(Exception e) {
-			return null;
+			return new ResponseEntity(HttpStatus.BAD_REQUEST.toString(), HttpStatus.BAD_REQUEST);
+
 		}
 	}
 	

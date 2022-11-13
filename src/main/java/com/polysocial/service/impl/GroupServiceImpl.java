@@ -1,5 +1,6 @@
 package com.polysocial.service.impl;
 
+import com.polysocial.dto.StudentDTO;
 import com.polysocial.dto.GroupDTO;
 import com.polysocial.dto.MemberDTO;
 import com.polysocial.dto.UserDTO;
@@ -73,9 +74,10 @@ public class GroupServiceImpl implements GroupService {
 	}
 
 	@Override
-	public GroupDTO createGroup(Groups group) {
-		Groups groupEntity = groupRepo.save(group);
-		GroupDTO groupDTO = modelMapper.map(groupEntity, GroupDTO.class);
+	public GroupDTO createGroup(GroupDTO group) {
+		Groups groupEntity = modelMapper.map(group, Groups.class);
+		Groups groups = groupRepo.save(groupEntity);
+		GroupDTO groupDTO = modelMapper.map(groups, GroupDTO.class);
 		return groupDTO;
 	}
 
@@ -96,7 +98,7 @@ public class GroupServiceImpl implements GroupService {
 		ExcelService excel = new ExcelService();
 		HashMap<Integer, Users> map = new HashMap();
 		FileUploadUtil.saveFile("abc.xlsx", multipartFile);
-		String excelFilePath = "./Files/"+multipartFile.getOriginalFilename();
+		String excelFilePath = "./Files/abc.xlsx";
 		Long userId = (long) 1;
 		String groupName = "";
 		List<Book> books = excel.readExcel(excelFilePath);
@@ -143,11 +145,10 @@ public class GroupServiceImpl implements GroupService {
 	}
 
 	@Override
-	public MemberDTO saveMember(Long userId, Long groupId) {
-		Members member = new Members(userId, groupId, false);
+	public MemberDTO saveMember(StudentDTO user) {
+		Members member = new Members(user.getUserId(), user.getGroupId(), false);
 		MemberDTO memberDTO = modelMapper.map(memberRepo.save(member), MemberDTO.class);
 		return memberDTO;
-
 	}
 
 	@Override

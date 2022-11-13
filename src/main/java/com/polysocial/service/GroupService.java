@@ -10,6 +10,7 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.multipart.MultipartFile;
 
+import com.polysocial.dto.StudentDTO;
 import com.polysocial.dto.GroupDTO;
 import com.polysocial.dto.MemberDTO;
 import com.polysocial.dto.UserDTO;
@@ -33,7 +34,7 @@ public interface GroupService {
     
     Integer getUserId(String email);
     
-    GroupDTO createGroup(Groups group);
+    GroupDTO createGroup(GroupDTO group);
     
     UserDTO getOneMemberInGroup(String email, Long groupId);
     
@@ -45,7 +46,7 @@ public interface GroupService {
     
     List<GroupDTO> findByKeywork(String keywork);
     
-    MemberDTO saveMember(Long userId, Long groupId);
+    MemberDTO saveMember(StudentDTO user);
     
     List<Members> getAllGroupByStudent(Long userId);
     
