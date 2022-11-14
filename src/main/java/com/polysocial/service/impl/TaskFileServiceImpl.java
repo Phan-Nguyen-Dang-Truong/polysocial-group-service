@@ -13,6 +13,7 @@ import org.springframework.web.multipart.MultipartFile;
 
 import com.cloudinary.Cloudinary;
 import com.cloudinary.utils.ObjectUtils;
+import com.polysocial.dto.TaskFileCreateDTO;
 import com.polysocial.dto.TaskFileDTO;
 import com.polysocial.entity.TaskEx;
 import com.polysocial.entity.TaskFile;
@@ -43,22 +44,18 @@ public class TaskFileServiceImpl implements TaskFileService {
 	}
 
 	@Override
-	public void deleteTaskFile(Long taskFileId) {
-		taskFileRepository.deleteById(taskFileId);
+	public void deleteTaskFile(TaskFileDTO taskFileId) {
+		taskFileRepository.deleteById(taskFileId.getTaskFileId());
 	}
 
 	@Override
-	public TaskFile saveFile(MultipartFile file, Long exId, Long userId, Long groupId) {
-		try {
-			String url = this.saveFile(file);
-			TaskEx taskEx = taskExRepository.findByExIdAndUserIdAndGroupId(exId, userId, groupId);
-			String type = url.substring(url.lastIndexOf(".") + 1);
-			TaskFile taskFile = new TaskFile(url, type, taskEx);
-			return taskFileRepository.save(taskFile);
-		} catch (IOException e) {
-			e.printStackTrace();
-			return null;
-		}
+	public TaskFile saveFile(TaskFileCreateDTO taskFile) {
+		String url = taskFile.getPath();
+		TaskEx taskEx = taskExRepository.findByExIdAndUserIdAndGroupId(taskFile.getExId(), taskFile.getUserId(), taskFile.getGroupId());
+		String type = url.substring(url.lastIndexOf(".") + 1);
+		TaskFile taskFiles = new TaskFile(url, type, taskEx);
+		System.out.println(taskFiles.getTask().getTaskId());
+		return taskFileRepository.save(taskFiles);
 	}
 
 	public String saveFile(MultipartFile file) throws IOException {
@@ -110,24 +107,18 @@ public class TaskFileServiceImpl implements TaskFileService {
 	@Override
 	public TaskFile getFileUploadGroup(Long exId, Long userId, Long groupId) {
 		Long taskExId = taskExRepository.findByExIdAndUserIdAndGroupId(exId, userId, groupId).getTaskId();
-		System.out.println(taskExId);
 		TaskFile taskFile = taskFileRepository.findByTaskEx(taskExId);
 		return taskFile;
 	}
 
 	@Override
-	public TaskFile updateFile(MultipartFile file, Long exId, Long userId, Long groupId) {
-		try {
-			String url = this.saveFile(file);
-			TaskEx taskEx = taskExRepository.findByExIdAndUserIdAndGroupId(exId, userId, groupId);
-			String type = url.substring(url.lastIndexOf(".") + 1);
-			TaskFile taskFile = new TaskFile(url, type, taskEx);
-			Long idTaskFile = taskFileRepository.findByTaskEx(taskEx.getTaskId()).getTaskFileId();
-			taskFile.setTaskFileId(idTaskFile);
-			return taskFileRepository.save(taskFile);
-		} catch (IOException e) {
-			e.printStackTrace();
-			return null;
-		}
+	public TaskFile updateFile(TaskFileCreateDTO taskFile) {
+		String url = taskFile.getPath();
+		TaskEx taskEx = taskExRepository.findByExIdAndUserIdAndGroupId(taskFile.getExId(), taskFile.getUserId(), taskFile.getGroupId());
+		String type = url.substring(url.lastIndexOf(".") + 1);
+		TaskFile taskFiles = new TaskFile(url, type, taskEx);
+		Long idTaskFile = taskFileRepository.findByTaskEx(taskEx.getTaskId()).getTaskFileId();
+		taskFiles.setTaskFileId(idTaskFile);
+		return taskFileRepository.save(taskFiles);
 	}
 }

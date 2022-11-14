@@ -23,6 +23,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -141,10 +142,10 @@ public class GroupController {
     	}
     }
     
-	@PostMapping(value = GroupAPI.API_DELETE_GROUP, consumes = "application/json")
-	public ResponseEntity deleteGroup(@RequestBody GroupDTO group) {
+	@DeleteMapping(value = GroupAPI.API_DELETE_GROUP, consumes = "application/json")
+	public ResponseEntity deleteGroup(@RequestParam Long groupId) {
 		try {
-			GroupDTO groups = groupBusiness.deleteGroup(group.getGroupId());
+			GroupDTO groups = groupBusiness.deleteGroup(groupId);
 			return ResponseEntity.ok(groups);
 		}catch(Exception e) {
 			return new ResponseEntity(HttpStatus.BAD_REQUEST.toString(), HttpStatus.BAD_REQUEST);
@@ -153,9 +154,10 @@ public class GroupController {
 	}
     
     @DeleteMapping(GroupAPI.API_REMOVE_STUDENT)
-    public ResponseEntity removeStudentToClass(@RequestBody StudentDTO student){
+    public ResponseEntity removeStudentToClass(@RequestParam Long groupId, @RequestParam Long userId) {
     	try {
-        	groupBusiness.deleteMemberToGroup(student.getGroupId(), student.getUserId());
+			System.out.println(groupId);
+        	groupBusiness.deleteMemberToGroup(groupId, userId);
         	return ResponseEntity.ok("OK");
     	}catch(Exception e) {
 			e.printStackTrace();

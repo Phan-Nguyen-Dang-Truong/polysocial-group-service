@@ -1,6 +1,7 @@
 package com.polysocial.rest.controller;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -29,7 +30,7 @@ public class ExercisesController {
             return ResponseEntity.ok(exercises);
         } catch(Exception ex) {
             ex.printStackTrace();
-            return null;
+            return new ResponseEntity(HttpStatus.BAD_REQUEST.toString(), HttpStatus.BAD_REQUEST);
         }
     }
 
@@ -39,27 +40,27 @@ public class ExercisesController {
             ExercisesDTO exercises = exercisesService.updateOne(entity);
             return ResponseEntity.ok(exercises);
         } catch(Exception ex) {
-            return null;
+            return new ResponseEntity(HttpStatus.BAD_REQUEST.toString(), HttpStatus.BAD_REQUEST);
         }        
     }
 
     @DeleteMapping(value=ExercisesAPI.API_DELETE_EXERCISES)
-    public ResponseEntity deleteExercises(@RequestParam Long exId) {
+    public ResponseEntity deleteExercises(@RequestBody ExercisesDTO entity) {
         try {
-            ExercisesDTO exercises = exercisesService.deleteOne(exId);
+            ExercisesDTO exercises = exercisesService.deleteOne(entity.getExId());
             return ResponseEntity.ok(exercises);
         } catch(Exception ex) {
             ex.printStackTrace();
-            return null;
+            return new ResponseEntity(HttpStatus.BAD_REQUEST.toString(), HttpStatus.BAD_REQUEST);
         }        
     }
 
     @GetMapping(value=ExercisesAPI.API_GET_ALL_EXERCISES_END_DATE)
-    public ResponseEntity getAllExercisesEndDate(@RequestParam(value="groupId") Long groupId) {
+    public ResponseEntity getAllExercisesEndDate(@RequestParam Long groupId) {
         try {
             return ResponseEntity.ok(exercisesService.getAllExercisesEndDate(groupId));
         } catch(Exception ex) {
-            return null;
+            return new ResponseEntity(HttpStatus.BAD_REQUEST.toString(), HttpStatus.BAD_REQUEST);
         }        
     }
 
