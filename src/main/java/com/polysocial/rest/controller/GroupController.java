@@ -4,6 +4,8 @@ import com.polysocial.consts.GroupAPI;
 import com.polysocial.dto.StudentDTO;
 import com.polysocial.dto.GroupDTO;
 import com.polysocial.dto.MemberDTO;
+import com.polysocial.dto.MemberDTO2;
+import com.polysocial.dto.MemberGroupDTO;
 import com.polysocial.dto.UserDTO;
 import com.polysocial.entity.Groups;
 import com.polysocial.entity.Members;
@@ -102,7 +104,7 @@ public class GroupController {
     @GetMapping(GroupAPI.API_GET_ALL_STUDENT)
     public ResponseEntity getStudentByIdClass(@RequestParam Long groupId){
     	try {
-    		List<MemberDTO> list = groupBusiness.getMemberInGroup(groupId);
+    		List<UserDTO> list = groupBusiness.getMemberInGroup(groupId);
     		return ResponseEntity.ok(list);
     	}catch(Exception e) {
     		return new ResponseEntity(HttpStatus.BAD_REQUEST.toString(), HttpStatus.BAD_REQUEST);
@@ -116,6 +118,7 @@ public class GroupController {
     		UserDTO user =  groupBusiness.getOneMemberInGroup(email, groupId);
     		return ResponseEntity.ok(user);
     	}catch(Exception e) {
+			e.printStackTrace();
     		return new ResponseEntity(HttpStatus.BAD_REQUEST.toString(), HttpStatus.BAD_REQUEST);
     	}
     }
@@ -142,7 +145,7 @@ public class GroupController {
     	}
     }
     
-	@DeleteMapping(value = GroupAPI.API_DELETE_GROUP, consumes = "application/json")
+	@DeleteMapping(value = GroupAPI.API_DELETE_GROUP)	
 	public ResponseEntity deleteGroup(@RequestParam Long groupId) {
 		try {
 			GroupDTO groups = groupBusiness.deleteGroup(groupId);
@@ -182,7 +185,7 @@ public class GroupController {
 	@GetMapping(GroupAPI.API_GET_ALL_GROUP_STUDENT)
 	public ResponseEntity getAllGroupStudent(@RequestParam Long userId) {
 		try {
-			List<Members> list = groupBusiness.getAllGroupByStudent(userId);
+			List<MemberGroupDTO> list = groupBusiness.getAllGroupByStudent(userId);
 			return ResponseEntity.ok(list);
 		}catch(Exception e) {
 			return new ResponseEntity(HttpStatus.BAD_REQUEST.toString(), HttpStatus.BAD_REQUEST);
@@ -193,7 +196,7 @@ public class GroupController {
 	@GetMapping(GroupAPI.API_GET_ALL_GROUP_TEACHER)
 	public ResponseEntity getAllGroupTeacher(@RequestParam Long userId) {
 		try {
-			List<Members> list = groupBusiness.getAllGroupByTeacher(userId);
+			List<MemberGroupDTO> list = groupBusiness.getAllGroupByTeacher(userId);
 			return ResponseEntity.ok(list);
 		}catch(Exception e) {
 			return new ResponseEntity(HttpStatus.BAD_REQUEST.toString(), HttpStatus.BAD_REQUEST);

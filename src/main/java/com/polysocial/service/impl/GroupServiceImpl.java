@@ -3,6 +3,8 @@ package com.polysocial.service.impl;
 import com.polysocial.dto.StudentDTO;
 import com.polysocial.dto.GroupDTO;
 import com.polysocial.dto.MemberDTO;
+import com.polysocial.dto.MemberDTO2;
+import com.polysocial.dto.MemberGroupDTO;
 import com.polysocial.dto.UserDTO;
 import com.polysocial.entity.Book;
 import com.polysocial.entity.Groups;
@@ -16,6 +18,7 @@ import com.polysocial.service.FileUploadUtil;
 import com.polysocial.service.GroupService;
 
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -64,8 +67,11 @@ public class GroupServiceImpl implements GroupService {
 	}
 
 	@Override
-	public Object getTeacherFromGroup(Long groupId) {
-		return memberRepo.getTeacherFromGroup(groupId);
+	public UserDTO getTeacherFromGroup(Long groupId) {
+		Members member = memberRepo.getTeacherFromGroup(groupId);
+		Users user = userRepo.findById(member.getUserId()).get();
+		UserDTO userDTO = modelMapper.map(user, UserDTO.class);
+		return userDTO;
 	}
 
 	@Override
@@ -82,10 +88,15 @@ public class GroupServiceImpl implements GroupService {
 	}
 
 	@Override
-	public List<MemberDTO> getMemberInGroup(Long id) {
+	public List<UserDTO> getMemberInGroup(Long id) {
 		List<Members> listMember =  memberRepo.getMemberInGroup(id);
-		List<MemberDTO> listMemberDTO = listMember.stream().map(member -> modelMapper.map(member, MemberDTO.class)).collect(Collectors.toList());
-		return listMemberDTO;
+		List<UserDTO> listUserDTO = new ArrayList<>();
+		for(int i = 0 ; i <listMember.size(); i++){
+			Users user = userRepo.findById(listMember.get(i).getUserId()).get();			
+			UserDTO userDTO = modelMapper.map(user, UserDTO.class);
+			listUserDTO.add(userDTO);
+		}
+		return listUserDTO;
 	}
 
 	@Override
@@ -152,15 +163,27 @@ public class GroupServiceImpl implements GroupService {
 	}
 
 	@Override
-	public List<Members> getAllGroupByStudent(Long userId) {
+	public List<MemberGroupDTO> getAllGroupByStudent(Long userId) {
 		List<Members> list = memberRepo.getAllGroupByStudent(userId);
-		return list;
+		List<MemberGroupDTO> listDTO = new ArrayList();
+		for(int i = 0 ; i<list.size(); i++){
+			Groups groupOne = groupRepo.findById(list.get(i).getGroupId()).get();
+			MemberGroupDTO member = new MemberGroupDTO(groupOne.getGroupId(), groupOne.getName(), list.get(i).getIsTeacher(), groupOne.getTotalMember());
+			listDTO.add(member);
+		}
+		return listDTO;
 	}
 
 	@Override
-	public List<Members> getAllGroupByTeacher(Long userId) {
+	public List<MemberGroupDTO> getAllGroupByTeacher(Long userId) {
 		List<Members> list = memberRepo.getAllGroupByTeacher(userId);
-		return list;
+		List<MemberGroupDTO> listDTO = new ArrayList();
+		for(int i = 0 ; i<list.size(); i++){
+			Groups groupOne = groupRepo.findById(list.get(i).getGroupId()).get();
+			MemberGroupDTO member = new MemberGroupDTO(groupOne.getGroupId(), groupOne.getName(), list.get(i).getIsTeacher(), groupOne.getTotalMember());
+			listDTO.add(member);
+		}
+		return listDTO;
 	}
 
 	@Override
