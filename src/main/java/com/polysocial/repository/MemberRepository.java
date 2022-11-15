@@ -18,14 +18,14 @@ public interface MemberRepository extends JpaRepository<Members, Long>{
 	void removeUserToGroup(Long groupId, Long userId);
 	
 	@Query("SELECT o FROM Members o WHERE o.groupId =?1 and isTeacher like 1")
-	Object getTeacherFromGroup(Long groupId);
+	Members getTeacherFromGroup(Long groupId);
 	
 	@Modifying
 	@Query("SELECT o FROM Members o WHERE o.groupId =?1 and o.isTeacher = 0")
 	List<Members> getMemberInGroup(Long groupId);
 	
 	@Query("SELECT o FROM Members o WHERE o.userId =?1 and o.groupId =?2")
-	Users getOneMemberInGroup(Long userId, Long groupId);
+	Members getOneMemberInGroup(Long userId, Long groupId);
 	
 	@Query("SELECT o FROM Members o WHERE o.userId =?1 and o.isTeacher = 0")
 	List<Members> getAllGroupByStudent(Long userId);
