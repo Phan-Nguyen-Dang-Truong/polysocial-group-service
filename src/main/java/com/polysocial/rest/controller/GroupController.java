@@ -142,7 +142,7 @@ public class GroupController {
     	}
     }
     
-	@DeleteMapping(value = GroupAPI.API_DELETE_GROUP, consumes = "application/json")
+	@DeleteMapping(value = GroupAPI.API_DELETE_GROUP)
 	public ResponseEntity deleteGroup(@RequestParam Long groupId) {
 		try {
 			GroupDTO groups = groupBusiness.deleteGroup(groupId);
