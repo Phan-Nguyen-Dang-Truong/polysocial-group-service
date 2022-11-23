@@ -1,5 +1,6 @@
 package com.polysocial.rest.controller;
 
+import com.polysocial.config.jwt.JwtTokenProvider;
 import com.polysocial.consts.GroupAPI;
 import com.polysocial.dto.StudentDTO;
 import com.polysocial.dto.GroupDTO;
@@ -17,6 +18,7 @@ import java.util.List;
 
 import org.apache.tomcat.util.http.parser.MediaType;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.autoconfigure.security.oauth2.resource.OAuth2ResourceServerProperties.Jwt;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
@@ -29,6 +31,7 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestHeader;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
@@ -42,6 +45,9 @@ public class GroupController {
 	
     @Autowired
 	private GroupServiceImpl groupBusiness = new GroupServiceImpl();
+
+	@Autowired
+	private JwtTokenProvider jwt;
 	
     @GetMapping(GroupAPI.API_GET_ALL_GROUP)
 	@ResponseStatus(HttpStatus.OK)
@@ -159,7 +165,6 @@ public class GroupController {
     @DeleteMapping(GroupAPI.API_REMOVE_STUDENT)
     public ResponseEntity removeStudentToClass(@RequestParam Long groupId, @RequestParam Long userId) {
     	try {
-			System.out.println(groupId);
         	groupBusiness.deleteMemberToGroup(groupId, userId);
         	return ResponseEntity.ok("OK");
     	}catch(Exception e) {
@@ -170,11 +175,11 @@ public class GroupController {
     }	
     
 	@RequestMapping(value = GroupAPI.API_CREATE_GROUP_EXCEL, method = RequestMethod.POST, consumes = "multipart/form-data")
-	public ResponseEntity uploadFile(@RequestParam MultipartFile file)
+	public ResponseEntity uploadFile(@RequestParam MultipartFile file, @RequestParam Long groupId, @RequestHeader("Authorization") String token) 
 			throws IOException {
 		try {
-			groupBusiness.createExcel(file);
-			return ResponseEntity.ok("OK");
+			List<MemberDTO> list = groupBusiness.createExcel(file, groupId, jwt.getIdFromJWT(token));
+			return ResponseEntity.ok(list);
 		}catch(Exception e) {
 			e.printStackTrace();
 			return new ResponseEntity(HttpStatus.BAD_REQUEST.toString(), HttpStatus.BAD_REQUEST);
@@ -216,5 +221,62 @@ public class GroupController {
 		}
 	}
 	
-        
+	@PostMapping(GroupAPI.API_MEMBER_JOIN_GROUP)
+	public ResponseEntity memberJoinGroup(@RequestParam Long groupId, @RequestParam Long userId) {
+		try {
+			MemberDTO memberDTO = groupBusiness.memberJoinGroup(groupId, userId);
+			return ResponseEntity.ok(memberDTO);
+		}catch(Exception e) {
+			return new ResponseEntity(HttpStatus.BAD_REQUEST.toString(), HttpStatus.BAD_REQUEST);
+
+		}
+	}
+
+	@GetMapping(GroupAPI.API_MEMBER_JOIN_GROUP_FALSE)
+	public ResponseEntity getAllMemberGroupFalse(@RequestParam Long groupId) {
+		try {
+			List<MemberDTO2> list = groupBusiness.getAllMemberJoinGroupFalse(groupId);
+			return ResponseEntity.ok(list);
+		}catch(Exception e) {
+			e.printStackTrace();
+			return new ResponseEntity(HttpStatus.BAD_REQUEST.toString(), HttpStatus.BAD_REQUEST);
+
+		}
+	}
+
+	@PostMapping(GroupAPI.API_CONFIRM_MEMBER_GROUP)
+	public ResponseEntity confirmMemberGroup(@RequestParam Long groupId, @RequestParam Long userId) {
+		try {
+			UserDTO userDTO = groupBusiness.confirmOneMemberGroup(groupId, userId);
+			return ResponseEntity.ok(userDTO);
+		}catch(Exception e) {
+			e.printStackTrace();
+			return new ResponseEntity(HttpStatus.BAD_REQUEST.toString(), HttpStatus.BAD_REQUEST);
+
+		}
+	}
+
+	@PostMapping(GroupAPI.API_CONFIRM_ALL_MEMBER_GROUP)
+	public ResponseEntity confirmAllMemberGroup(@RequestParam Long groupId) {
+		try {
+			List<Members> list = groupBusiness.confirmAllMemberGroup(groupId);
+			return ResponseEntity.ok(list);
+		}catch(Exception e) {
+			e.printStackTrace();
+			return new ResponseEntity(HttpStatus.BAD_REQUEST.toString(), HttpStatus.BAD_REQUEST);
+
+		}
+	}
+
+	@DeleteMapping(GroupAPI.API_LEAVE_GROUP)
+	public ResponseEntity leaveGroup(@RequestParam Long groupId, @RequestParam Long userId) {
+		try {
+			groupBusiness.memberLeaveGroup(groupId, userId);
+			return ResponseEntity.ok("OK");
+		}catch(Exception e) {
+			e.printStackTrace();
+			return new ResponseEntity(HttpStatus.BAD_REQUEST.toString(), HttpStatus.BAD_REQUEST);
+
+		}
+	}
 }

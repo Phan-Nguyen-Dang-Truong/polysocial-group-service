@@ -9,10 +9,7 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
-
-import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.polysocial.entity.Groups;
-import com.polysocial.entity.Members;
 @Transactional
 public interface GroupRepository extends JpaRepository<Groups, Long> {
 	@Query("SELECT o FROM Groups o WHERE o.groupId =?1")

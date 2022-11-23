@@ -1,50 +1,39 @@
 package com.polysocial.entity;
 
+import com.fasterxml.jackson.annotation.JsonManagedReference;
 import lombok.*;
 import org.hibernate.Hibernate;
 
 import javax.persistence.*;
 import java.io.Serializable;
-import java.time.LocalDateTime;
-import java.util.Date;
 import java.util.List;
 import java.util.Objects;
 
-@Data
-@AllArgsConstructor
+@Getter
+@Setter
 @RequiredArgsConstructor
 @Entity
-public class Groups implements Serializable {
+public class Roles implements Serializable {
 
-	@Id
+    @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long groupId;
+    private Long roleId;
 
     private String name;
 
-    private Long totalMember;
-
     private String description;
 
-    private Boolean status = true;
+    @JsonManagedReference
+    @OneToMany(mappedBy = "role", fetch = FetchType.LAZY, cascade=CascadeType.ALL)
+    @ToString.Exclude
+    private List<Users> users;
 
-    private LocalDateTime createdDate = LocalDateTime.now();
-    
-
-    public Groups(String name, Long totalMember) {
-		this.name = name;
-		this.totalMember = totalMember;
-	}
-
-    @OneToMany(mappedBy = "group")
-    private List<Exercises> exercises;
-    
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
         if (o == null || Hibernate.getClass(this) != Hibernate.getClass(o)) return false;
-        Groups groups = (Groups) o;
-        return groupId != null && Objects.equals(groupId, groups.groupId);
+        Roles roles = (Roles) o;
+        return roleId != null && Objects.equals(roleId, roles.roleId);
     }
 
     @Override
