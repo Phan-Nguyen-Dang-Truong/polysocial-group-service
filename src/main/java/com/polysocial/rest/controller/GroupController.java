@@ -1,6 +1,5 @@
 package com.polysocial.rest.controller;
 
-import com.polysocial.config.jwt.JwtTokenProvider;
 import com.polysocial.consts.GroupAPI;
 import com.polysocial.dto.StudentDTO;
 import com.polysocial.dto.GroupDTO;
@@ -46,8 +45,6 @@ public class GroupController {
     @Autowired
 	private GroupServiceImpl groupBusiness = new GroupServiceImpl();
 
-	@Autowired
-	private JwtTokenProvider jwt;
 	
     @GetMapping(GroupAPI.API_GET_ALL_GROUP)
 	@ResponseStatus(HttpStatus.OK)
@@ -175,10 +172,10 @@ public class GroupController {
     }	
     
 	@RequestMapping(value = GroupAPI.API_CREATE_GROUP_EXCEL, method = RequestMethod.POST, consumes = "multipart/form-data")
-	public ResponseEntity uploadFile(@RequestParam MultipartFile file, @RequestParam Long groupId, @RequestHeader("Authorization") String token) 
+	public ResponseEntity uploadFile(@RequestParam MultipartFile file, @RequestParam Long groupId, @RequestParam Long teacherId) 
 			throws IOException {
 		try {
-			List<MemberDTO> list = groupBusiness.createExcel(file, groupId, jwt.getIdFromJWT(token));
+			List<MemberDTO> list = groupBusiness.createExcel(file, groupId, teacherId);
 			return ResponseEntity.ok(list);
 		}catch(Exception e) {
 			e.printStackTrace();
