@@ -27,6 +27,8 @@ public class Groups implements Serializable {
     private String description;
 
     private Boolean status = true;
+    
+    private String className;
 
     private LocalDateTime createdDate = LocalDateTime.now();
     

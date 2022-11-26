@@ -7,12 +7,16 @@ import com.polysocial.dto.MemberDTO2;
 import com.polysocial.dto.MemberGroupDTO;
 import com.polysocial.dto.UserDTO;
 import com.polysocial.entity.Book;
+import com.polysocial.entity.Contacts;
 import com.polysocial.entity.Groups;
 import com.polysocial.entity.Members;
+import com.polysocial.entity.RoomChats;
 import com.polysocial.entity.StorageCapacity;
 import com.polysocial.entity.Users;
+import com.polysocial.repository.ContactRepository;
 import com.polysocial.repository.GroupRepository;
 import com.polysocial.repository.MemberRepository;
+import com.polysocial.repository.RoomChatRepository;
 import com.polysocial.repository.StorageCapacityRepo;
 import com.polysocial.repository.UserRepository;
 import com.polysocial.service.ExcelService;
@@ -43,9 +47,12 @@ public class GroupServiceImpl implements GroupService {
 	private MemberRepository memberRepo;
 	@Autowired
 	private UserRepository userRepo;
-
 	@Autowired
 	private StorageCapacityRepo storageCapacityRepo;
+	@Autowired
+	private RoomChatRepository roomChatRepo;
+	@Autowired
+	private ContactRepository contactRepo;
 
 	@Override
 	public Page<Groups> getAll(Pageable page) {
@@ -89,6 +96,12 @@ public class GroupServiceImpl implements GroupService {
 		Groups groupEntity = modelMapper.map(group, Groups.class);
 		Groups groups = groupRepo.save(groupEntity);
 		GroupDTO groupDTO = modelMapper.map(groups, GroupDTO.class);
+		RoomChats room = new RoomChats();
+		room.setName(groups.getName()+"_"+groups.getClassName());
+		RoomChats roomCreate = roomChatRepo.save(room);
+		Contacts contact = new Contacts(userRepo.findById(group.getAdminId()).get(), roomCreate);
+		contact.setIsAdmin(true);
+		contactRepo.save(contact);
 		Members member = new Members(group.getAdminId(), groupDTO.getGroupId(), true, true);
 		memberRepo.save(member);
 		return groupDTO;
@@ -123,30 +136,41 @@ public class GroupServiceImpl implements GroupService {
 
 	@Override
 	public List<MemberDTO> createExcel(MultipartFile multipartFile, Long groupId, Long userId) throws IOException {
-		if(checkCapacity(userId, multipartFile.getSize()) == false) return null;
-		ExcelService excel = new ExcelService();
-		HashMap<Integer, Users> map = new HashMap();
-		FileUploadUtil.saveFile("abc.xlsx", multipartFile);
-		String excelFilePath = "./Files/abc.xlsx";
-		Long user_id = (long) 1;
-		List<Book> books = excel.readExcel(excelFilePath);
-		for (int i = 0; i < books.size() - 1; i++) {
-			user_id = Long.parseLong(userRepo.getIdUserByEmail(books.get(i).getEmail()) + "");
-			map.put(i, userRepo.findById(user_id).get());
-		}
+		try{
+			if(checkCapacity(userId, multipartFile.getSize()) == false) return null;
+			ExcelService excel = new ExcelService();
+			HashMap<Integer, Users> map = new HashMap();
+			FileUploadUtil.saveFile("abc.xlsx", multipartFile);
+			String excelFilePath = "./Files/abc.xlsx";
+			Long user_id = (long) 1;
+			List<Book> books = excel.readExcel(excelFilePath);
+			for (int i = 0; i < books.size()/2-1; i++) {
+				user_id = Long.parseLong(userRepo.getIdUserByEmail(books.get(i).getEmail()) + "");
+				map.put(i, userRepo.findById(user_id).get());
+			}
+			Groups group = new Groups(groupRepo.findById(groupId).get().getName(), Long.parseLong(map.size()+""));
+			group.setGroupId(groupId);
+			group.setClassName(groupRepo.findById(groupId).get().getClassName());
+			group.setDescription(groupRepo.findById(groupId).get().getDescription());
 
-		Groups group = new Groups(groupRepo.findById(groupId).get().getName(), Long.parseLong(map.size()+""));
-		group.setGroupId(groupId);
-		groupRepo.save(group);
-		map.entrySet().forEach(entry -> {
-			Users user = entry.getValue();
-			Members member = new Members(user.getUserId(), group.getGroupId(), false, true);
-			memberRepo.save(member);
-		});
-		List<Members> listMember = memberRepo.getMemberInGroup(groupId);
-		List<MemberDTO> listMemberDTO = listMember.stream().map(element -> modelMapper.map(element, MemberDTO.class))
-		.collect(Collectors.toList());
-		return listMemberDTO;
+			groupRepo.save(group);
+			map.entrySet().forEach(entry -> {
+				Users user = entry.getValue();
+				Members member = new Members(user.getUserId(), group.getGroupId(), false, true);
+				memberRepo.save(member);
+				String nameGroup = groupRepo.findById(groupId).get().getName()+"_"+groupRepo.findById(groupId).get().getClassName();
+				System.out.println(nameGroup);
+				Contacts contact = new Contacts(user, roomChatRepo.getRoomByName(nameGroup).get(0));
+				contactRepo.save(contact);
+			});
+			List<Members> listMember = memberRepo.getMemberInGroup(groupId);
+			List<MemberDTO> listMemberDTO = listMember.stream().map(element -> modelMapper.map(element, MemberDTO.class))
+			.collect(Collectors.toList());
+			return listMemberDTO;
+		}catch(Exception e){
+			e.printStackTrace();
+			return null;
+		}
 
 	}
 
