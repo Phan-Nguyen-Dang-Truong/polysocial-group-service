@@ -1,6 +1,7 @@
 package com.polysocial.service.impl;
 
 import com.polysocial.dto.StudentDTO;
+import com.polysocial.dto.ContactDTO;
 import com.polysocial.dto.GroupDTO;
 import com.polysocial.dto.MemberDTO;
 import com.polysocial.dto.MemberDTO2;
@@ -214,18 +215,37 @@ public class GroupServiceImpl implements GroupService {
 		for(int i = 0 ; i<list.size(); i++){
 			Groups groupOne = groupRepo.findById(list.get(i).getGroupId()).get();
 			MemberGroupDTO member = new MemberGroupDTO(groupOne.getGroupId(), groupOne.getName(), list.get(i).getIsTeacher(), groupOne.getTotalMember());
+			Long roomId = roomChatRepo.getRoomByName(groupOne.getName()+"_"+groupOne.getClassName()).get(0).getRoomId();
+			List<Contacts> contact = contactRepo.getContactByRoomId(roomId);
+			List<ContactDTO> listContactDTO = new ArrayList<>();
+			for(int j =0; j<contact.size(); j++){
+				ContactDTO contactDTO = new ContactDTO(contact.get(j).getUser().getUserId(), contact.get(j).getUser().getFullName(), contact.get(j).getUser().getEmail(), contact.get(j).getUser().getAvatar());
+				listContactDTO.add(contactDTO);
+			}
+			member.setListContact(listContactDTO);
 			listDTO.add(member);
 		}
 		return listDTO;
 	}
 
+
 	@Override
 	public List<MemberGroupDTO> getAllGroupByTeacher(Long userId) {
 		List<Members> list = memberRepo.getAllGroupByTeacher(userId);
+		System.out.println(list.size());
 		List<MemberGroupDTO> listDTO = new ArrayList();
 		for(int i = 0 ; i<list.size(); i++){
 			Groups groupOne = groupRepo.findById(list.get(i).getGroupId()).get();
 			MemberGroupDTO member = new MemberGroupDTO(groupOne.getGroupId(), groupOne.getName(), list.get(i).getIsTeacher(), groupOne.getTotalMember());
+			System.out.println(groupOne.getName()+"_"+groupOne.getClassName());
+			Long roomId = roomChatRepo.getRoomByName(groupOne.getName()+"_"+groupOne.getClassName()).get(0).getRoomId();
+			List<Contacts> contact = contactRepo.getContactByRoomId(roomId);
+			List<ContactDTO> listContactDTO = new ArrayList<>();
+			for(int j =0; j<contact.size(); j++){
+				ContactDTO contactDTO = new ContactDTO(contact.get(j).getUser().getUserId(), contact.get(j).getUser().getFullName(), contact.get(j).getUser().getEmail(), contact.get(j).getUser().getAvatar());
+				listContactDTO.add(contactDTO);
+			}
+			member.setListContact(listContactDTO);
 			listDTO.add(member);
 		}
 		return listDTO;

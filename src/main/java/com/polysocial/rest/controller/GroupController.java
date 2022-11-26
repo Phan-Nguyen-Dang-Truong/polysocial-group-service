@@ -186,6 +186,7 @@ public class GroupController {
 			List<MemberGroupDTO> list = groupBusiness.getAllGroupByStudent(userId);
 			return ResponseEntity.ok(list);
 		}catch(Exception e) {
+			e.printStackTrace();
 			return new ResponseEntity(HttpStatus.BAD_REQUEST.toString(), HttpStatus.BAD_REQUEST);
 
 		}
@@ -197,6 +198,7 @@ public class GroupController {
 			List<MemberGroupDTO> list = groupBusiness.getAllGroupByTeacher(userId);
 			return ResponseEntity.ok(list);
 		}catch(Exception e) {
+			e.printStackTrace();
 			return new ResponseEntity(HttpStatus.BAD_REQUEST.toString(), HttpStatus.BAD_REQUEST);
 
 		}
