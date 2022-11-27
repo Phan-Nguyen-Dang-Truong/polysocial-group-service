@@ -22,6 +22,8 @@ public class Contacts implements Serializable {
 
     private Boolean isAdmin = false;
 
+    private Long roomId;
+
     @JsonBackReference
     @ManyToOne
     @JoinColumn(name = "userId")
@@ -29,7 +31,7 @@ public class Contacts implements Serializable {
 
     @JsonBackReference
     @ManyToOne
-    @JoinColumn(name = "roomId")
+    @JoinColumn(name = "roomId", insertable = false, updatable = false)
     private RoomChats room;
 
     @JsonManagedReference

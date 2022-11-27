@@ -27,4 +27,6 @@ public class GroupDTO implements Serializable {
     private LocalDateTime createdDate = LocalDateTime.now();
 
     private Long adminId;
+
+    private String avatar;
 }

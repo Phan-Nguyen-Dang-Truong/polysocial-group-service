@@ -98,15 +98,19 @@ public class GroupServiceImpl implements GroupService {
 		Groups groups = groupRepo.save(groupEntity);
 		GroupDTO groupDTO = modelMapper.map(groups, GroupDTO.class);
 		RoomChats room = new RoomChats();
-		room.setName(groups.getName()+"_"+groups.getClassName());
+		room.setGroup(groups);
 		RoomChats roomCreate = roomChatRepo.save(room);
-		Contacts contact = new Contacts(userRepo.findById(group.getAdminId()).get(), roomCreate);
+		Contacts contact = new Contacts();
+		contact.setRoomId(roomCreate.getRoomId());
+		contact.setRoom(roomCreate);
+		contact.setUser(userRepo.findById(group.getAdminId()).get());
 		contact.setIsAdmin(true);
 		contactRepo.save(contact);
 		Members member = new Members(group.getAdminId(), groupDTO.getGroupId(), true, true);
 		memberRepo.save(member);
 		return groupDTO;
 	}
+
 
 	@Override
 	public List<UserDTO> getMemberInGroup(Long id) {
@@ -121,8 +125,13 @@ public class GroupServiceImpl implements GroupService {
 	}
 
 	@Override
-	public void updateGroup(String name, Integer totalMember, String description, Long groupId) {
-		groupRepo.updateGroup(name, totalMember, description, groupId);
+	public GroupDTO updateGroup(GroupDTO group) {
+		Groups groupEntity = modelMapper.map(group, Groups.class);
+		Groups groups = groupRepo.save(groupEntity);
+		GroupDTO groupDTO = modelMapper.map(groups, GroupDTO.class);
+		Members member = new Members(group.getAdminId(), groupDTO.getGroupId(), true, true);
+		memberRepo.save(member);
+		return groupDTO;
 	}
 
 	public Boolean checkCapacity(Long userId, Long size) {
@@ -159,9 +168,7 @@ public class GroupServiceImpl implements GroupService {
 				Users user = entry.getValue();
 				Members member = new Members(user.getUserId(), group.getGroupId(), false, true);
 				memberRepo.save(member);
-				String nameGroup = groupRepo.findById(groupId).get().getName()+"_"+groupRepo.findById(groupId).get().getClassName();
-				System.out.println(nameGroup);
-				Contacts contact = new Contacts(user, roomChatRepo.getRoomByName(nameGroup).get(0));
+				Contacts contact = new Contacts(user, roomChatRepo.getRoomByGroupId(group.getGroupId()).get(0));
 				contactRepo.save(contact);
 			});
 			List<Members> listMember = memberRepo.getMemberInGroup(groupId);
@@ -215,11 +222,11 @@ public class GroupServiceImpl implements GroupService {
 		for(int i = 0 ; i<list.size(); i++){
 			Groups groupOne = groupRepo.findById(list.get(i).getGroupId()).get();
 			MemberGroupDTO member = new MemberGroupDTO(groupOne.getGroupId(), groupOne.getName(), list.get(i).getIsTeacher(), groupOne.getTotalMember());
-			Long roomId = roomChatRepo.getRoomByName(groupOne.getName()+"_"+groupOne.getClassName()).get(0).getRoomId();
+			Long roomId = roomChatRepo.getRoomByGroupId(groupOne.getGroupId()).get(0).getRoomId();
 			List<Contacts> contact = contactRepo.getContactByRoomId(roomId);
 			List<ContactDTO> listContactDTO = new ArrayList<>();
 			for(int j =0; j<contact.size(); j++){
-				ContactDTO contactDTO = new ContactDTO(contact.get(j).getUser().getUserId(), contact.get(j).getUser().getFullName(), contact.get(j).getUser().getEmail(), contact.get(j).getUser().getAvatar());
+				ContactDTO contactDTO = new ContactDTO(contact.get(j).getUser().getUserId(), contact.get(j).getUser().getFullName(), contact.get(j).getUser().getEmail(), contact.get(j).getUser().getAvatar(), contact.get(j).getUser().getStudentCode());
 				listContactDTO.add(contactDTO);
 			}
 			member.setListContact(listContactDTO);
@@ -237,12 +244,11 @@ public class GroupServiceImpl implements GroupService {
 		for(int i = 0 ; i<list.size(); i++){
 			Groups groupOne = groupRepo.findById(list.get(i).getGroupId()).get();
 			MemberGroupDTO member = new MemberGroupDTO(groupOne.getGroupId(), groupOne.getName(), list.get(i).getIsTeacher(), groupOne.getTotalMember());
-			System.out.println(groupOne.getName()+"_"+groupOne.getClassName());
-			Long roomId = roomChatRepo.getRoomByName(groupOne.getName()+"_"+groupOne.getClassName()).get(0).getRoomId();
+			Long roomId = roomChatRepo.getRoomByGroupId(groupOne.getGroupId()).get(0).getRoomId();
 			List<Contacts> contact = contactRepo.getContactByRoomId(roomId);
 			List<ContactDTO> listContactDTO = new ArrayList<>();
 			for(int j =0; j<contact.size(); j++){
-				ContactDTO contactDTO = new ContactDTO(contact.get(j).getUser().getUserId(), contact.get(j).getUser().getFullName(), contact.get(j).getUser().getEmail(), contact.get(j).getUser().getAvatar());
+				ContactDTO contactDTO = new ContactDTO(contact.get(j).getUser().getUserId(), contact.get(j).getUser().getFullName(), contact.get(j).getUser().getEmail(), contact.get(j).getUser().getAvatar(), contact.get(j).getUser().getStudentCode());
 				listContactDTO.add(contactDTO);
 			}
 			member.setListContact(listContactDTO);

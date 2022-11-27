@@ -73,6 +73,7 @@ public class GroupController {
     		Object o =  groupBusiness.createGroup(group);
     		return ResponseEntity.ok(o);
     	}catch(Exception e) {
+			e.printStackTrace();
     		return new ResponseEntity(HttpStatus.BAD_REQUEST.toString(), HttpStatus.BAD_REQUEST);
     	}	
     	
@@ -86,6 +87,7 @@ public class GroupController {
 			Object o = groupBusiness.createGroup(group);
 			return ResponseEntity.ok(o);
 		}catch(Exception e) {
+			e.printStackTrace();
     		return new ResponseEntity(HttpStatus.BAD_REQUEST.toString(), HttpStatus.BAD_REQUEST);
 		}
 	}

@@ -31,6 +31,8 @@ public class Groups implements Serializable {
     private String className;
 
     private LocalDateTime createdDate = LocalDateTime.now();
+
+    private String avatar;
     
 
     public Groups(String name, Long totalMember) {

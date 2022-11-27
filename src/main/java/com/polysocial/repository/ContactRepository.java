@@ -11,7 +11,7 @@ import com.polysocial.entity.Contacts;
 @Repository
 public interface ContactRepository extends JpaRepository<Contacts, Long> {
 
-    @Query("SELECT c FROM Contacts c WHERE c.room.roomId = ?1")
+    @Query("SELECT c FROM Contacts c WHERE c.roomId = ?1")
     List<Contacts> getContactByRoomId(Long roomId);
     
 }

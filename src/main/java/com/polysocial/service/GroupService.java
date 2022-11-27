@@ -43,7 +43,7 @@ public interface GroupService {
     
     List<UserDTO> getMemberInGroup(Long id);
             
-    void updateGroup(String name, Integer totalMember, String description, Long groupId);
+    GroupDTO updateGroup(GroupDTO group);
     
     List<MemberDTO> createExcel(MultipartFile multipartFile, Long groupId, Long userId) throws IOException;
     

@@ -11,7 +11,7 @@ import com.polysocial.entity.RoomChats;
 @Repository
 public interface RoomChatRepository extends JpaRepository<RoomChats, Long> {
 
-    @Query("SELECT r FROM RoomChats r WHERE r.name =?1")
-    List<RoomChats> getRoomByName(String name);
+    @Query("SELECT r FROM RoomChats r WHERE r.group.groupId =?1")
+    List<RoomChats> getRoomByGroupId(Long groupId);
     
 }
