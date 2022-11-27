@@ -152,7 +152,7 @@ public class GroupServiceImpl implements GroupService {
 			String excelFilePath = "./Files/abc.xlsx";
 			Long user_id = (long) 1;
 			List<Book> books = excel.readExcel(excelFilePath);
-			for (int i = 0; i < books.size()/2-1; i++) {
+			for (int i = 0; i < books.size()-1; i++) {
 				user_id = Long.parseLong(userRepo.getIdUserByEmail(books.get(i).getEmail()) + "");
 				map.put(i, userRepo.findById(user_id).get());
 			}
@@ -225,7 +225,7 @@ public class GroupServiceImpl implements GroupService {
 				List<Contacts> contact = contactRepo.getContactByRoomId(roomId);
 				List<ContactDTO> listContactDTO = new ArrayList<>();
 				for(int j =0; j<contact.size(); j++){
-					ContactDTO contactDTO = new ContactDTO(contact.get(j).getUser().getUserId(), contact.get(j).getUser().getFullName(), contact.get(j).getUser().getEmail(), contact.get(j).getUser().getAvatar(), contact.get(j).getUser().getStudentCode());
+					ContactDTO contactDTO = new ContactDTO(contact.get(j).getUser().getUserId(), contact.get(j).getUser().getFullName(), contact.get(j).getUser().getEmail(), contact.get(j).getUser().getAvatar(), contact.get(j).getUser().getStudentCode(), contact.get(j).getContactId());
 					listContactDTO.add(contactDTO);
 				}
 				member.setListContact(listContactDTO);
@@ -252,7 +252,7 @@ public class GroupServiceImpl implements GroupService {
 				List<Contacts> contact = contactRepo.getContactByRoomId(roomId);
 				List<ContactDTO> listContactDTO = new ArrayList<>();
 				for(int j =0; j<contact.size(); j++){
-					ContactDTO contactDTO = new ContactDTO(contact.get(j).getUser().getUserId(), contact.get(j).getUser().getFullName(), contact.get(j).getUser().getEmail(), contact.get(j).getUser().getAvatar(), contact.get(j).getUser().getStudentCode());
+					ContactDTO contactDTO = new ContactDTO(contact.get(j).getUser().getUserId(), contact.get(j).getUser().getFullName(), contact.get(j).getUser().getEmail(), contact.get(j).getUser().getAvatar(), contact.get(j).getUser().getStudentCode(), contact.get(j).getContactId());
 					listContactDTO.add(contactDTO);
 				}
 				member.setListContact(listContactDTO);
