@@ -150,8 +150,9 @@ public class GroupServiceImpl implements GroupService {
 			HashMap<Integer, Users> map = new HashMap();
 			FileUploadUtil.saveFile("abc.xlsx", multipartFile);
 			String excelFilePath = "./Files/abc.xlsx";
-			Long user_id = (long) 1;
+			Long user_id = (long) 1;;
 			List<Book> books = excel.readExcel(excelFilePath);
+			System.out.println(books.size()+"---");
 			for (int i = 0; i < books.size()-1; i++) {
 				user_id = Long.parseLong(userRepo.getIdUserByEmail(books.get(i).getEmail()) + "");
 				map.put(i, userRepo.findById(user_id).get());
