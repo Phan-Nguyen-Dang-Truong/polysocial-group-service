@@ -84,7 +84,7 @@ public class GroupController {
 		try {
 			if(group.getGroupId() == null) return new ResponseEntity(HttpStatus.BAD_REQUEST.toString(), HttpStatus.BAD_REQUEST);
 
-			Object o = groupBusiness.createGroup(group);
+			Object o = groupBusiness.updateGroup(group);
 			return ResponseEntity.ok(o);
 		}catch(Exception e) {
 			e.printStackTrace();

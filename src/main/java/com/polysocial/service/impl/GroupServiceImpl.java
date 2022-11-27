@@ -129,8 +129,6 @@ public class GroupServiceImpl implements GroupService {
 		Groups groupEntity = modelMapper.map(group, Groups.class);
 		Groups groups = groupRepo.save(groupEntity);
 		GroupDTO groupDTO = modelMapper.map(groups, GroupDTO.class);
-		Members member = new Members(group.getAdminId(), groupDTO.getGroupId(), true, true);
-		memberRepo.save(member);
 		return groupDTO;
 	}
 
@@ -222,15 +220,20 @@ public class GroupServiceImpl implements GroupService {
 		for(int i = 0 ; i<list.size(); i++){
 			Groups groupOne = groupRepo.findById(list.get(i).getGroupId()).get();
 			MemberGroupDTO member = new MemberGroupDTO(groupOne.getGroupId(), groupOne.getName(), list.get(i).getIsTeacher(), groupOne.getTotalMember());
-			Long roomId = roomChatRepo.getRoomByGroupId(groupOne.getGroupId()).get(0).getRoomId();
-			List<Contacts> contact = contactRepo.getContactByRoomId(roomId);
-			List<ContactDTO> listContactDTO = new ArrayList<>();
-			for(int j =0; j<contact.size(); j++){
-				ContactDTO contactDTO = new ContactDTO(contact.get(j).getUser().getUserId(), contact.get(j).getUser().getFullName(), contact.get(j).getUser().getEmail(), contact.get(j).getUser().getAvatar(), contact.get(j).getUser().getStudentCode());
-				listContactDTO.add(contactDTO);
+			try{
+				Long roomId = roomChatRepo.getRoomByGroupId(groupOne.getGroupId()).get(0).getRoomId();
+				List<Contacts> contact = contactRepo.getContactByRoomId(roomId);
+				List<ContactDTO> listContactDTO = new ArrayList<>();
+				for(int j =0; j<contact.size(); j++){
+					ContactDTO contactDTO = new ContactDTO(contact.get(j).getUser().getUserId(), contact.get(j).getUser().getFullName(), contact.get(j).getUser().getEmail(), contact.get(j).getUser().getAvatar(), contact.get(j).getUser().getStudentCode());
+					listContactDTO.add(contactDTO);
+				}
+				member.setListContact(listContactDTO);
+			}catch(Exception e){
+
 			}
-			member.setListContact(listContactDTO);
 			listDTO.add(member);
+
 		}
 		return listDTO;
 	}
@@ -244,14 +247,18 @@ public class GroupServiceImpl implements GroupService {
 		for(int i = 0 ; i<list.size(); i++){
 			Groups groupOne = groupRepo.findById(list.get(i).getGroupId()).get();
 			MemberGroupDTO member = new MemberGroupDTO(groupOne.getGroupId(), groupOne.getName(), list.get(i).getIsTeacher(), groupOne.getTotalMember());
-			Long roomId = roomChatRepo.getRoomByGroupId(groupOne.getGroupId()).get(0).getRoomId();
-			List<Contacts> contact = contactRepo.getContactByRoomId(roomId);
-			List<ContactDTO> listContactDTO = new ArrayList<>();
-			for(int j =0; j<contact.size(); j++){
-				ContactDTO contactDTO = new ContactDTO(contact.get(j).getUser().getUserId(), contact.get(j).getUser().getFullName(), contact.get(j).getUser().getEmail(), contact.get(j).getUser().getAvatar(), contact.get(j).getUser().getStudentCode());
-				listContactDTO.add(contactDTO);
+			try{
+				Long roomId = roomChatRepo.getRoomByGroupId(groupOne.getGroupId()).get(0).getRoomId();
+				List<Contacts> contact = contactRepo.getContactByRoomId(roomId);
+				List<ContactDTO> listContactDTO = new ArrayList<>();
+				for(int j =0; j<contact.size(); j++){
+					ContactDTO contactDTO = new ContactDTO(contact.get(j).getUser().getUserId(), contact.get(j).getUser().getFullName(), contact.get(j).getUser().getEmail(), contact.get(j).getUser().getAvatar(), contact.get(j).getUser().getStudentCode());
+					listContactDTO.add(contactDTO);
+				}
+				member.setListContact(listContactDTO);
+			}catch(Exception e){
+
 			}
-			member.setListContact(listContactDTO);
 			listDTO.add(member);
 		}
 		return listDTO;
