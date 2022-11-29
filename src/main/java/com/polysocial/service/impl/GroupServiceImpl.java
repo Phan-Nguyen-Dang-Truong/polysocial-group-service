@@ -116,7 +116,6 @@ public class GroupServiceImpl implements GroupService {
 	public List<UserDTO> getMemberInGroup(Long id) {
 <<<<<<< HEAD
 <<<<<<< HEAD
-<<<<<<< HEAD
 		List<Members> listMember = memberRepo.getMemberInGroup(id);
 		List<UserDTO> listUserDTO = new ArrayList<UserDTO>();
 
@@ -125,16 +124,11 @@ public class GroupServiceImpl implements GroupService {
 =======
 =======
 >>>>>>> parent of d815701 (add redis)
-=======
->>>>>>> parent of d815701 (add redis)
 		List<Members> listMember =  memberRepo.getMemberInGroup(id);
 		List<UserDTO> listUserDTO = new ArrayList<>();
 		for(int i = 0 ; i <listMember.size(); i++){
 			Users user = userRepo.findById(listMember.get(i).getUserId()).get();			
 <<<<<<< HEAD
-<<<<<<< HEAD
->>>>>>> parent of d815701 (add redis)
-=======
 >>>>>>> parent of d815701 (add redis)
 =======
 >>>>>>> parent of d815701 (add redis)
@@ -172,16 +166,9 @@ public class GroupServiceImpl implements GroupService {
 			String excelFilePath = "./Files/abc.xlsx";
 <<<<<<< HEAD
 <<<<<<< HEAD
-<<<<<<< HEAD
 			Long user_id = (long) 1;
 			List<Book> books = excel.readExcel(excelFilePath);
 			for (int i = 0; i < books.size() - 1; i++) {
-=======
-			Long user_id = (long) 1;;
-			List<Book> books = excel.readExcel(excelFilePath);
-			System.out.println(books.size()+"---");
-			for (int i = 0; i < books.size()-1; i++) {
->>>>>>> parent of d815701 (add redis)
 =======
 			Long user_id = (long) 1;;
 			List<Book> books = excel.readExcel(excelFilePath);
@@ -245,14 +232,9 @@ public class GroupServiceImpl implements GroupService {
 		Users users = userRepo.findById(userId).get();
 <<<<<<< HEAD
 <<<<<<< HEAD
-<<<<<<< HEAD
 		UserDTO userDTO2 = modelMapper.map(users, UserDTO.class);
 		return userDTO2;
 
-=======
-		UserDTO userDTO = modelMapper.map(users, UserDTO.class);
-		return userDTO;
->>>>>>> parent of d815701 (add redis)
 =======
 		UserDTO userDTO = modelMapper.map(users, UserDTO.class);
 		return userDTO;
@@ -301,10 +283,6 @@ public class GroupServiceImpl implements GroupService {
 		List<Members> list = memberRepo.getAllGroupByTeacher(userId);
 <<<<<<< HEAD
 <<<<<<< HEAD
-<<<<<<< HEAD
-=======
-		System.out.println(list.size());
->>>>>>> parent of d815701 (add redis)
 =======
 		System.out.println(list.size());
 >>>>>>> parent of d815701 (add redis)
@@ -351,7 +329,6 @@ public class GroupServiceImpl implements GroupService {
 		List<MemberDTO2> listUser = new ArrayList();
 <<<<<<< HEAD
 <<<<<<< HEAD
-<<<<<<< HEAD
 
 		for (Members member : listMember) {
 			Users user = userRepo.findById(member.getUserId()).get();
@@ -359,13 +336,6 @@ public class GroupServiceImpl implements GroupService {
 			listUser.add(userDTO);
 		}
 
-=======
-		for (Members member : listMember) {
-			Users user =  userRepo.findById(member.getUserId()).get();
-			MemberDTO2 userDTO = modelMapper.map(user, MemberDTO2.class);
-			listUser.add(userDTO);
-		}
->>>>>>> parent of d815701 (add redis)
 =======
 		for (Members member : listMember) {
 			Users user =  userRepo.findById(member.getUserId()).get();
@@ -402,7 +372,6 @@ public class GroupServiceImpl implements GroupService {
 	public void memberLeaveGroup(Long groupId, Long userId) {
 		memberRepo.memberLeaveGroup(groupId, userId);		
 <<<<<<< HEAD
-<<<<<<< HEAD
 	}
 
 	@Override
@@ -433,8 +402,6 @@ public class GroupServiceImpl implements GroupService {
 
 		}
 		return listDTO;
-=======
->>>>>>> parent of d815701 (add redis)
 =======
 >>>>>>> parent of d815701 (add redis)
 	}
