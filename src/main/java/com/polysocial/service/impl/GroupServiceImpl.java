@@ -318,9 +318,7 @@ public class GroupServiceImpl implements GroupService {
 			MemberGroupDTO member = new MemberGroupDTO(groupOne.getGroupId(), groupOne.getName(),
 					list.get(i).getIsTeacher(), groupOne.getTotalMember());
 			try {
-				System.out.println("111111");
 				Long roomId = roomChatRepo.getRoomByGroupId(groupOne.getGroupId()).get(0).getRoomId();
-				System.out.println("room id "+roomId);
 				List<Contacts> contact = contactRepo.getContactByRoomId(roomId);
 				List<ContactDTO> listContactDTO = new ArrayList<>();
 				for (int j = 0; j < contact.size(); j++) {
