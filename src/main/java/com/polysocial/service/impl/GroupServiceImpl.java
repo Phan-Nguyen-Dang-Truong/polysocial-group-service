@@ -1,17 +1,24 @@
 package com.polysocial.service.impl;
 
 import com.polysocial.dto.StudentDTO;
+import com.polysocial.dto.ContactDTO;
 import com.polysocial.dto.GroupDTO;
 import com.polysocial.dto.MemberDTO;
 import com.polysocial.dto.MemberDTO2;
 import com.polysocial.dto.MemberGroupDTO;
 import com.polysocial.dto.UserDTO;
 import com.polysocial.entity.Book;
+import com.polysocial.entity.Contacts;
 import com.polysocial.entity.Groups;
 import com.polysocial.entity.Members;
+import com.polysocial.entity.RoomChats;
+import com.polysocial.entity.StorageCapacity;
 import com.polysocial.entity.Users;
+import com.polysocial.repository.ContactRepository;
 import com.polysocial.repository.GroupRepository;
 import com.polysocial.repository.MemberRepository;
+import com.polysocial.repository.RoomChatRepository;
+import com.polysocial.repository.StorageCapacityRepo;
 import com.polysocial.repository.UserRepository;
 import com.polysocial.service.ExcelService;
 import com.polysocial.service.FileUploadUtil;
@@ -41,6 +48,12 @@ public class GroupServiceImpl implements GroupService {
 	private MemberRepository memberRepo;
 	@Autowired
 	private UserRepository userRepo;
+	@Autowired
+	private StorageCapacityRepo storageCapacityRepo;
+	@Autowired
+	private RoomChatRepository roomChatRepo;
+	@Autowired
+	private ContactRepository contactRepo;
 
 	@Override
 	public Page<Groups> getAll(Pageable page) {
@@ -56,7 +69,7 @@ public class GroupServiceImpl implements GroupService {
 
 	@Override
 	public void addMemberToGroup(Users user, Groups group) {
-		Members member = new Members(user.getUserId(), group.getGroupId(), false);
+		Members member = new Members(user.getUserId(), group.getGroupId(), false, true);
 		memberRepo.save(member);
 
 	}
@@ -84,15 +97,35 @@ public class GroupServiceImpl implements GroupService {
 		Groups groupEntity = modelMapper.map(group, Groups.class);
 		Groups groups = groupRepo.save(groupEntity);
 		GroupDTO groupDTO = modelMapper.map(groups, GroupDTO.class);
+		RoomChats room = new RoomChats();
+		room.setGroup(groups);
+		RoomChats roomCreate = roomChatRepo.save(room);
+		Contacts contact = new Contacts();
+		contact.setRoomId(roomCreate.getRoomId());
+		contact.setRoom(roomCreate);
+		contact.setUser(userRepo.findById(group.getAdminId()).get());
+		contact.setIsAdmin(true);
+		contactRepo.save(contact);
+		Members member = new Members(group.getAdminId(), groupDTO.getGroupId(), true, true);
+		memberRepo.save(member);
 		return groupDTO;
 	}
 
+
 	@Override
 	public List<UserDTO> getMemberInGroup(Long id) {
+<<<<<<< HEAD
+		List<Members> listMember = memberRepo.getMemberInGroup(id);
+		List<UserDTO> listUserDTO = new ArrayList<UserDTO>();
+
+		for (int i = 0; i < listMember.size(); i++) {
+			Users user = userRepo.findById(listMember.get(i).getUserId()).get();
+=======
 		List<Members> listMember =  memberRepo.getMemberInGroup(id);
 		List<UserDTO> listUserDTO = new ArrayList<>();
 		for(int i = 0 ; i <listMember.size(); i++){
 			Users user = userRepo.findById(listMember.get(i).getUserId()).get();			
+>>>>>>> parent of d815701 (add redis)
 			UserDTO userDTO = modelMapper.map(user, UserDTO.class);
 			listUserDTO.add(userDTO);
 		}
@@ -100,32 +133,65 @@ public class GroupServiceImpl implements GroupService {
 	}
 
 	@Override
-	public void updateGroup(String name, Integer totalMember, String description, Long groupId) {
-		groupRepo.updateGroup(name, totalMember, description, groupId);
+	public GroupDTO updateGroup(GroupDTO group) {
+		Groups groupEntity = modelMapper.map(group, Groups.class);
+		Groups groups = groupRepo.save(groupEntity);
+		GroupDTO groupDTO = modelMapper.map(groups, GroupDTO.class);
+		return groupDTO;
+	}
+
+	public Boolean checkCapacity(Long userId, Long size) {
+		StorageCapacity storageCapacity = storageCapacityRepo.findByUserId(userId);
+		if(storageCapacity.getCapacity() > storageCapacity.getUsed()+size){
+			storageCapacity.setUsed(storageCapacity.getUsed()+size);
+			storageCapacityRepo.save(storageCapacity);
+			return true;
+		}
+		return false;
 	}
 
 	@Override
-	public void createExcel(MultipartFile multipartFile) throws IOException {
-		ExcelService excel = new ExcelService();
-		HashMap<Integer, Users> map = new HashMap();
-		FileUploadUtil.saveFile("abc.xlsx", multipartFile);
-		String excelFilePath = "./Files/abc.xlsx";
-		Long userId = (long) 1;
-		String groupName = "";
-		List<Book> books = excel.readExcel(excelFilePath);
-		for (int i = 0; i < books.size() - 1; i++) {
-			userId = Long.parseLong(userRepo.getIdUserByEmail(books.get(i).getEmail()) + "");
-			map.put(i, userRepo.findById(userId).get());
-		}
+	public List<MemberDTO> createExcel(MultipartFile multipartFile, Long groupId, Long userId) throws IOException {
+		try{
+			if(checkCapacity(userId, multipartFile.getSize()) == false) return null;
+			ExcelService excel = new ExcelService();
+			HashMap<Integer, Users> map = new HashMap();
+			FileUploadUtil.saveFile("abc.xlsx", multipartFile);
+			String excelFilePath = "./Files/abc.xlsx";
+<<<<<<< HEAD
+			Long user_id = (long) 1;
+			List<Book> books = excel.readExcel(excelFilePath);
+			for (int i = 0; i < books.size() - 1; i++) {
+=======
+			Long user_id = (long) 1;;
+			List<Book> books = excel.readExcel(excelFilePath);
+			System.out.println(books.size()+"---");
+			for (int i = 0; i < books.size()-1; i++) {
+>>>>>>> parent of d815701 (add redis)
+				user_id = Long.parseLong(userRepo.getIdUserByEmail(books.get(i).getEmail()) + "");
+				map.put(i, userRepo.findById(user_id).get());
+			}
+			Groups group = new Groups(groupRepo.findById(groupId).get().getName(), Long.parseLong(map.size()+""));
+			group.setGroupId(groupId);
+			group.setClassName(groupRepo.findById(groupId).get().getClassName());
+			group.setDescription(groupRepo.findById(groupId).get().getDescription());
 
-		groupName = books.get(0).getGroupName();
-		Groups group = new Groups(groupName, Long.parseLong(map.size() + ""));
-		groupRepo.save(group);
-		map.entrySet().forEach(entry -> {
-			Users user = entry.getValue();
-			Members member = new Members(user.getUserId(), group.getGroupId(), false);
-			memberRepo.save(member);
-		});
+			groupRepo.save(group);
+			map.entrySet().forEach(entry -> {
+				Users user = entry.getValue();
+				Members member = new Members(user.getUserId(), group.getGroupId(), false, true);
+				memberRepo.save(member);
+				Contacts contact = new Contacts(user, roomChatRepo.getRoomByGroupId(group.getGroupId()).get(0));
+				contactRepo.save(contact);
+			});
+			List<Members> listMember = memberRepo.getMemberInGroup(groupId);
+			List<MemberDTO> listMemberDTO = listMember.stream().map(element -> modelMapper.map(element, MemberDTO.class))
+			.collect(Collectors.toList());
+			return listMemberDTO;
+		}catch(Exception e){
+			e.printStackTrace();
+			return null;
+		}
 
 	}
 
@@ -151,13 +217,19 @@ public class GroupServiceImpl implements GroupService {
 		Long userId = (long) userRepo.getIdUserByEmail(email);
 		memberRepo.getOneMemberInGroup(userId, groupId);
 		Users users = userRepo.findById(userId).get();
+<<<<<<< HEAD
+		UserDTO userDTO2 = modelMapper.map(users, UserDTO.class);
+		return userDTO2;
+
+=======
 		UserDTO userDTO = modelMapper.map(users, UserDTO.class);
 		return userDTO;
+>>>>>>> parent of d815701 (add redis)
 	}
 
 	@Override
 	public MemberDTO saveMember(StudentDTO user) {
-		Members member = new Members(user.getUserId(), user.getGroupId(), false);
+		Members member = new Members(user.getUserId(), user.getGroupId(), false, true);
 		MemberDTO memberDTO = modelMapper.map(memberRepo.save(member), MemberDTO.class);
 		return memberDTO;
 	}
@@ -169,18 +241,48 @@ public class GroupServiceImpl implements GroupService {
 		for(int i = 0 ; i<list.size(); i++){
 			Groups groupOne = groupRepo.findById(list.get(i).getGroupId()).get();
 			MemberGroupDTO member = new MemberGroupDTO(groupOne.getGroupId(), groupOne.getName(), list.get(i).getIsTeacher(), groupOne.getTotalMember());
+			try{
+				Long roomId = roomChatRepo.getRoomByGroupId(groupOne.getGroupId()).get(0).getRoomId();
+				List<Contacts> contact = contactRepo.getContactByRoomId(roomId);
+				List<ContactDTO> listContactDTO = new ArrayList<>();
+				for(int j =0; j<contact.size(); j++){
+					ContactDTO contactDTO = new ContactDTO(contact.get(j).getUser().getUserId(), contact.get(j).getUser().getFullName(), contact.get(j).getUser().getEmail(), contact.get(j).getUser().getAvatar(), contact.get(j).getUser().getStudentCode(), contact.get(j).getContactId());
+					listContactDTO.add(contactDTO);
+				}
+				member.setListContact(listContactDTO);
+			}catch(Exception e){
+
+			}
 			listDTO.add(member);
+
 		}
 		return listDTO;
 	}
 
+
 	@Override
 	public List<MemberGroupDTO> getAllGroupByTeacher(Long userId) {
 		List<Members> list = memberRepo.getAllGroupByTeacher(userId);
+<<<<<<< HEAD
+=======
+		System.out.println(list.size());
+>>>>>>> parent of d815701 (add redis)
 		List<MemberGroupDTO> listDTO = new ArrayList();
 		for(int i = 0 ; i<list.size(); i++){
 			Groups groupOne = groupRepo.findById(list.get(i).getGroupId()).get();
 			MemberGroupDTO member = new MemberGroupDTO(groupOne.getGroupId(), groupOne.getName(), list.get(i).getIsTeacher(), groupOne.getTotalMember());
+			try{
+				Long roomId = roomChatRepo.getRoomByGroupId(groupOne.getGroupId()).get(0).getRoomId();
+				List<Contacts> contact = contactRepo.getContactByRoomId(roomId);
+				List<ContactDTO> listContactDTO = new ArrayList<>();
+				for(int j =0; j<contact.size(); j++){
+					ContactDTO contactDTO = new ContactDTO(contact.get(j).getUser().getUserId(), contact.get(j).getUser().getFullName(), contact.get(j).getUser().getEmail(), contact.get(j).getUser().getAvatar(), contact.get(j).getUser().getStudentCode(), contact.get(j).getContactId());
+					listContactDTO.add(contactDTO);
+				}
+				member.setListContact(listContactDTO);
+			}catch(Exception e){
+
+			}
 			listDTO.add(member);
 		}
 		return listDTO;
@@ -189,6 +291,86 @@ public class GroupServiceImpl implements GroupService {
 	@Override
 	public Page<Groups> getAllGroupFalse(Pageable page) {
 		return groupRepo.getAllGroupFalse(page);
+	}
+
+
+	@Override
+	public MemberDTO memberJoinGroup(Long groupId, Long userId) {
+		Members member = new Members(userId, groupId, false, false);
+		MemberDTO memberDTO = modelMapper.map(memberRepo.save(member), MemberDTO.class);
+		return memberDTO;
+	}
+
+	@Override
+	public List<MemberDTO2> getAllMemberJoinGroupFalse(Long groupId) {
+		List<Members> listMember = memberRepo.getUserJoin(groupId);
+		List<MemberDTO2> listUser = new ArrayList();
+<<<<<<< HEAD
+
+		for (Members member : listMember) {
+			Users user = userRepo.findById(member.getUserId()).get();
+			MemberDTO2 userDTO = modelMapper.map(user, MemberDTO2.class);
+			listUser.add(userDTO);
+		}
+
+=======
+		for (Members member : listMember) {
+			Users user =  userRepo.findById(member.getUserId()).get();
+			MemberDTO2 userDTO = modelMapper.map(user, MemberDTO2.class);
+			listUser.add(userDTO);
+		}
+>>>>>>> parent of d815701 (add redis)
+		return listUser;
+	}
+
+	@Override
+	public UserDTO confirmOneMemberGroup(Long groupId, Long userId) {
+		memberRepo.confirmUser(groupId, userId);
+		Users user = userRepo.findById(userId).get();
+		UserDTO userDTO = modelMapper.map(user, UserDTO.class);
+		return userDTO;
+	}
+
+	@Override
+	public List<Members> confirmAllMemberGroup(Long groupId) {
+		memberRepo.confirmAllUser(groupId);
+		List<Members> listMember = memberRepo.getMemberInGroup(groupId);
+		return listMember;
+	}
+
+	@Override
+	public void memberLeaveGroup(Long groupId, Long userId) {
+		memberRepo.memberLeaveGroup(groupId, userId);		
+	}
+
+	@Override
+	public List<MemberGroupDTO> getAllGroupByUser(Long userId) {
+		List<Members> list = memberRepo.getAllGroupByUser(userId);
+		List<MemberGroupDTO> listDTO = new ArrayList();
+		for (int i = 0; i < list.size(); i++) {
+			Groups groupOne = groupRepo.findById(list.get(i).getGroupId()).get();
+			MemberGroupDTO member = new MemberGroupDTO(groupOne.getGroupId(), groupOne.getName(),
+					list.get(i).getIsTeacher(), groupOne.getTotalMember());
+			try {
+				System.out.println("111111");
+				Long roomId = roomChatRepo.getRoomByGroupId(groupOne.getGroupId()).get(0).getRoomId();
+				System.out.println("room id "+roomId);
+				List<Contacts> contact = contactRepo.getContactByRoomId(roomId);
+				List<ContactDTO> listContactDTO = new ArrayList<>();
+				for (int j = 0; j < contact.size(); j++) {
+					ContactDTO contactDTO = new ContactDTO(contact.get(j).getUser().getUserId(),
+							contact.get(j).getUser().getFullName(), contact.get(j).getUser().getEmail(),
+							contact.get(j).getUser().getAvatar(), contact.get(j).getUser().getStudentCode(),
+							contact.get(j).getContactId());
+					listContactDTO.add(contactDTO);
+				}
+				member.setListContact(listContactDTO);
+			} catch (Exception e) {
+			}
+			listDTO.add(member);
+
+		}
+		return listDTO;
 	}
 
 }

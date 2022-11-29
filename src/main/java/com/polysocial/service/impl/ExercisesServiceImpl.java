@@ -44,7 +44,7 @@ public class ExercisesServiceImpl implements ExercisesService {
         Exercises exercises = exercisesRepo.save(exercise);
         for(int i = 0; i< listMember.size();i++){
             TaskExDTO taskExDTO = new TaskExDTO(exercise.getExId(), listMember.get(i).getUserId(), exercise.getGroup().getGroupId());
-            Members member = new Members(listMember.get(i).getUserId(), exercise.getGroup().getGroupId(), false);
+            Members member = new Members(listMember.get(i).getUserId(), exercise.getGroup().getGroupId(), false, true);
             TaskEx taskEx = modelMapper.map(taskExDTO, TaskEx.class);
             taskEx.setMember(member);
             taskEx.setExercise(exercises);

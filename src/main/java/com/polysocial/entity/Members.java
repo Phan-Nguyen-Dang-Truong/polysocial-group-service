@@ -26,9 +26,12 @@ public class Members implements Serializable {
     @Id
     private Long groupId;
 
-    
     private Boolean isTeacher;
 
+    private Boolean confirm ;
+
+
+    
 
     @Override
     public boolean equals(Object o) {

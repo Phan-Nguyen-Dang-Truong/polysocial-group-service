@@ -1,6 +1,7 @@
 package com.polysocial.service;
 
 import java.io.IOException;
+import java.lang.reflect.Member;
 import java.util.List;
 import java.util.Optional;
 
@@ -42,9 +43,9 @@ public interface GroupService {
     
     List<UserDTO> getMemberInGroup(Long id);
             
-    void updateGroup(String name, Integer totalMember, String description, Long groupId);
+    GroupDTO updateGroup(GroupDTO group);
     
-    void createExcel(MultipartFile multipartFile) throws IOException;
+    List<MemberDTO> createExcel(MultipartFile multipartFile, Long groupId, Long userId) throws IOException;
     
     List<GroupDTO> findByKeywork(String keywork);
     
@@ -55,6 +56,19 @@ public interface GroupService {
     List<MemberGroupDTO> getAllGroupByTeacher(Long userId);
 
     Page<Groups> getAllGroupFalse(Pageable page);
+
+    MemberDTO memberJoinGroup(Long groupId, Long userId);
+
+    List<MemberDTO2> getAllMemberJoinGroupFalse(Long groupId);
+
+    UserDTO confirmOneMemberGroup(Long groupId, Long userId);
+
+    List<Members> confirmAllMemberGroup(Long groupId);
+
+    void memberLeaveGroup(Long groupId, Long userId);
+
+    List<MemberGroupDTO> getAllGroupByUser(Long userId);
+    
     
             
 }

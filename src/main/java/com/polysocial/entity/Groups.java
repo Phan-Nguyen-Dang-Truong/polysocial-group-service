@@ -14,7 +14,6 @@ import java.util.Objects;
 @AllArgsConstructor
 @RequiredArgsConstructor
 @Entity
-
 public class Groups implements Serializable {
 
 	@Id
@@ -28,11 +27,15 @@ public class Groups implements Serializable {
     private String description;
 
     private Boolean status = true;
+    
+    private String className;
 
     private LocalDateTime createdDate = LocalDateTime.now();
+
+    private String avatar;
     
+
     public Groups(String name, Long totalMember) {
-		super();
 		this.name = name;
 		this.totalMember = totalMember;
 	}

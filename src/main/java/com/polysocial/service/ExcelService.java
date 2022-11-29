@@ -21,8 +21,8 @@ import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 import com.polysocial.entity.Book;
 
 public class ExcelService {
-	public static final int COLUMN_INDEX_STUDENTCODE = 0;
-	public static final int COLUMN_INDEX_FULLNAME = 1;
+	public static final int COLUMN_INDEX_STUDENTCODE = 1;
+	public static final int COLUMN_INDEX_FULLNAME = 0;
 	public static final int COLUMN_INDEX_EMAIL = 2;
 
 	public List<Book> readExcel(String excelFilePath) throws IOException {
@@ -69,7 +69,6 @@ public class ExcelService {
 					break;
 				case COLUMN_INDEX_EMAIL:
 					book.setEmail((String) getCellValue(cell));
-					book.setGroupName(workbook.getSheetName(0));
 					break;
 				default:
 					break;

@@ -26,6 +26,7 @@ public class ExercisesController {
     @PostMapping(value = ExercisesAPI.API_CREATE_EXERCISES, consumes  = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity createExercises(@RequestBody(required = false) ExercisesDTO exercise) {
         try {
+        	exercise.formatEndDate();
             ExercisesDTO exercises = exercisesService.createOne(exercise);
             return ResponseEntity.ok(exercises);
         } catch(Exception ex) {
@@ -37,6 +38,7 @@ public class ExercisesController {
     @PutMapping(value=ExercisesAPI.API_UPDATE_EXERCISES)
     public ResponseEntity updateExercises(@RequestBody ExercisesDTO entity) {
         try {
+        	entity.formatEndDate();
             ExercisesDTO exercises = exercisesService.updateOne(entity);
             return ResponseEntity.ok(exercises);
         } catch(Exception ex) {
