@@ -47,4 +47,7 @@ public interface MemberRepository extends JpaRepository<Members, Long>{
 	@Transactional
 	@Query("DELETE FROM Members o WHERE o.groupId =?1 and o.userId =?2")
 	void memberLeaveGroup(Long groupId, Long userId);
+
+	@Query("SELECT o FROM Members o WHERE o.userId =?1 and o.confirm=1")
+	List<Members> getAllGroupByUser(Long userId);
 }

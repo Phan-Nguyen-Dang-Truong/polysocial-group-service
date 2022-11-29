@@ -33,6 +33,8 @@ public class GroupAPI {
     
     public static final String API_GET_ALL_GROUP_TEACHER = "/api/get-all/group/teacher";
 
+    public static final String API_GET_ALL_GROUP_BY_USER = "/api/get-all/group/user";
+
     public static final String API_GET_ALL_GROUP_FALSE = "/api/get-all/group/false";
 
     public static final String API_MEMBER_JOIN_GROUP = "/api/member-join-group";
