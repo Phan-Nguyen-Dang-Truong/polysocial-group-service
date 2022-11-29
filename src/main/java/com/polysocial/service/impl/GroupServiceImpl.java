@@ -369,4 +369,38 @@ public class GroupServiceImpl implements GroupService {
 		memberRepo.memberLeaveGroup(groupId, userId);
 	}
 
+	@Override
+	public List<MemberGroupDTO> getAllGroupByUser(Long userId) {
+		List<Members> list = memberRepo.getAllGroupByUser(userId);
+		Map<Long, List<MemberGroupDTO>> map = groupRedisRepo.getAllList();
+		List<List<MemberGroupDTO>> values = map.values().stream().collect(Collectors.toList());
+		if (list.size() == values.get(0).size()) {
+			return values.get(0);
+		}
+		List<MemberGroupDTO> listDTO = new ArrayList();
+		for (int i = 0; i < list.size(); i++) {
+			Groups groupOne = groupRepo.findById(list.get(i).getGroupId()).get();
+			MemberGroupDTO member = new MemberGroupDTO(groupOne.getGroupId(), groupOne.getName(),
+					list.get(i).getIsTeacher(), groupOne.getTotalMember());
+			try {
+				Long roomId = roomChatRepo.getRoomByGroupId(groupOne.getGroupId()).get(0).getRoomId();
+				List<Contacts> contact = contactRepo.getContactByRoomId(roomId);
+				List<ContactDTO> listContactDTO = new ArrayList<>();
+				for (int j = 0; j < contact.size(); j++) {
+					ContactDTO contactDTO = new ContactDTO(contact.get(j).getUser().getUserId(),
+							contact.get(j).getUser().getFullName(), contact.get(j).getUser().getEmail(),
+							contact.get(j).getUser().getAvatar(), contact.get(j).getUser().getStudentCode(),
+							contact.get(j).getContactId());
+					listContactDTO.add(contactDTO);
+				}
+				member.setListContact(listContactDTO);
+			} catch (Exception e) {
+
+			}
+			listDTO.add(member);
+		}
+		groupRedisRepo.createList(listDTO);
+		return listDTO;
+	}
+
 }

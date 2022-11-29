@@ -26,9 +26,6 @@ public class RoomChats implements Serializable {
     @JoinColumn(name = "groupId")
     private Groups group;
 
-    private LocalDateTime createdDate = LocalDateTime.now();
-
-    
 
     @Override
     public boolean equals(Object o) {

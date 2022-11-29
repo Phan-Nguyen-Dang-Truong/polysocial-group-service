@@ -278,4 +278,16 @@ public class GroupController {
 
 		}
 	}
+
+	@GetMapping(GroupAPI.API_GET_ALL_GROUP_USER)
+	public ResponseEntity getAllGroupUser(@RequestParam Long userId) {
+		try {
+			List<MemberGroupDTO> list = groupBusiness.getAllGroupByUser(userId);
+			return ResponseEntity.ok(list);
+		}catch(Exception e) {
+			e.printStackTrace();
+			return new ResponseEntity(HttpStatus.BAD_REQUEST.toString(), HttpStatus.BAD_REQUEST);
+
+		}
+	}
 }
