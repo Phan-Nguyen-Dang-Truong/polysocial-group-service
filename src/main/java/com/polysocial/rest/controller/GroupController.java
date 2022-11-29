@@ -14,7 +14,6 @@ import com.polysocial.service.impl.GroupServiceImpl;
 
 import java.io.IOException;
 import java.util.List;
-import java.util.Optional;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
@@ -45,9 +44,9 @@ public class GroupController {
 	
     @GetMapping(GroupAPI.API_GET_ALL_GROUP)
 	@ResponseStatus(HttpStatus.OK)
-    public ResponseEntity<Page> getAll(@RequestParam Optional<Integer> page, @RequestParam Optional<Integer> limit){
+    public ResponseEntity<Page> getAll(@RequestParam Integer page, @RequestParam Integer limit){
     	try {
-    		Pageable pageable = PageRequest.of(page.orElse(0), limit.orElse(10));
+    		Pageable pageable = PageRequest.of(page, limit);
     		Page<Groups> list = groupBusiness.getAll(pageable);
     		return ResponseEntity.ok(list);
     	}catch(Exception e) {
@@ -109,7 +108,6 @@ public class GroupController {
     		List<UserDTO> list = groupBusiness.getMemberInGroup(groupId);
     		return ResponseEntity.ok(list);
     	}catch(Exception e) {
-			e.printStackTrace();
     		return new ResponseEntity(HttpStatus.BAD_REQUEST.toString(), HttpStatus.BAD_REQUEST);
     	}
     	
