@@ -26,7 +26,6 @@ public class RoomChats implements Serializable {
     @JoinColumn(name = "groupId")
     private Groups group;
 
-
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;

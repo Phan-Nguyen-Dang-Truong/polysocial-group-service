@@ -66,6 +66,9 @@ public interface GroupService {
     List<Members> confirmAllMemberGroup(Long groupId);
 
     void memberLeaveGroup(Long groupId, Long userId);
+
+    List<MemberGroupDTO> getAllGroupByUser(Long userId);
+    
     
     List<MemberGroupDTO> getAllGroupByUser(Long userId);
             
