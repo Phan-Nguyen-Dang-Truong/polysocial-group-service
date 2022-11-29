@@ -114,18 +114,10 @@ public class GroupServiceImpl implements GroupService {
 
 	@Override
 	public List<UserDTO> getMemberInGroup(Long id) {
-<<<<<<< HEAD
-		List<Members> listMember = memberRepo.getMemberInGroup(id);
-		List<UserDTO> listUserDTO = new ArrayList<UserDTO>();
-
-		for (int i = 0; i < listMember.size(); i++) {
-			Users user = userRepo.findById(listMember.get(i).getUserId()).get();
-=======
 		List<Members> listMember =  memberRepo.getMemberInGroup(id);
 		List<UserDTO> listUserDTO = new ArrayList<>();
 		for(int i = 0 ; i <listMember.size(); i++){
 			Users user = userRepo.findById(listMember.get(i).getUserId()).get();			
->>>>>>> parent of d815701 (add redis)
 			UserDTO userDTO = modelMapper.map(user, UserDTO.class);
 			listUserDTO.add(userDTO);
 		}
@@ -158,16 +150,10 @@ public class GroupServiceImpl implements GroupService {
 			HashMap<Integer, Users> map = new HashMap();
 			FileUploadUtil.saveFile("abc.xlsx", multipartFile);
 			String excelFilePath = "./Files/abc.xlsx";
-<<<<<<< HEAD
-			Long user_id = (long) 1;
-			List<Book> books = excel.readExcel(excelFilePath);
-			for (int i = 0; i < books.size() - 1; i++) {
-=======
 			Long user_id = (long) 1;;
 			List<Book> books = excel.readExcel(excelFilePath);
 			System.out.println(books.size()+"---");
 			for (int i = 0; i < books.size()-1; i++) {
->>>>>>> parent of d815701 (add redis)
 				user_id = Long.parseLong(userRepo.getIdUserByEmail(books.get(i).getEmail()) + "");
 				map.put(i, userRepo.findById(user_id).get());
 			}
@@ -217,14 +203,8 @@ public class GroupServiceImpl implements GroupService {
 		Long userId = (long) userRepo.getIdUserByEmail(email);
 		memberRepo.getOneMemberInGroup(userId, groupId);
 		Users users = userRepo.findById(userId).get();
-<<<<<<< HEAD
-		UserDTO userDTO2 = modelMapper.map(users, UserDTO.class);
-		return userDTO2;
-
-=======
 		UserDTO userDTO = modelMapper.map(users, UserDTO.class);
 		return userDTO;
->>>>>>> parent of d815701 (add redis)
 	}
 
 	@Override
@@ -263,10 +243,6 @@ public class GroupServiceImpl implements GroupService {
 	@Override
 	public List<MemberGroupDTO> getAllGroupByTeacher(Long userId) {
 		List<Members> list = memberRepo.getAllGroupByTeacher(userId);
-<<<<<<< HEAD
-=======
-		System.out.println(list.size());
->>>>>>> parent of d815701 (add redis)
 		List<MemberGroupDTO> listDTO = new ArrayList();
 		for(int i = 0 ; i<list.size(); i++){
 			Groups groupOne = groupRepo.findById(list.get(i).getGroupId()).get();
@@ -305,21 +281,11 @@ public class GroupServiceImpl implements GroupService {
 	public List<MemberDTO2> getAllMemberJoinGroupFalse(Long groupId) {
 		List<Members> listMember = memberRepo.getUserJoin(groupId);
 		List<MemberDTO2> listUser = new ArrayList();
-<<<<<<< HEAD
-
-		for (Members member : listMember) {
-			Users user = userRepo.findById(member.getUserId()).get();
-			MemberDTO2 userDTO = modelMapper.map(user, MemberDTO2.class);
-			listUser.add(userDTO);
-		}
-
-=======
 		for (Members member : listMember) {
 			Users user =  userRepo.findById(member.getUserId()).get();
 			MemberDTO2 userDTO = modelMapper.map(user, MemberDTO2.class);
 			listUser.add(userDTO);
 		}
->>>>>>> parent of d815701 (add redis)
 		return listUser;
 	}
 
