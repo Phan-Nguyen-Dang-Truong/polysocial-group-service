@@ -14,6 +14,9 @@ import com.polysocial.entity.Members;
 import com.polysocial.entity.RoomChats;
 import com.polysocial.entity.StorageCapacity;
 import com.polysocial.entity.Users;
+import com.polysocial.redis.GroupRedisRepo;
+import com.polysocial.redis.MemberDTO2RedisRepo;
+import com.polysocial.redis.UserDTORedisRepo;
 import com.polysocial.repository.ContactRepository;
 import com.polysocial.repository.GroupRepository;
 import com.polysocial.repository.MemberRepository;
@@ -28,8 +31,10 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.stream.Collectors;
 
+import org.apache.catalina.User;
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
@@ -54,6 +59,12 @@ public class GroupServiceImpl implements GroupService {
 	private RoomChatRepository roomChatRepo;
 	@Autowired
 	private ContactRepository contactRepo;
+	@Autowired
+	private GroupRedisRepo groupRedisRepo;
+	@Autowired
+	private UserDTORedisRepo userDTORedisRepo;
+	@Autowired
+	private MemberDTO2RedisRepo memberDTO2RedisRepo;
 
 	@Override
 	public Page<Groups> getAll(Pageable page) {
@@ -111,30 +122,25 @@ public class GroupServiceImpl implements GroupService {
 		return groupDTO;
 	}
 
-
 	@Override
 	public List<UserDTO> getMemberInGroup(Long id) {
-<<<<<<< HEAD
-<<<<<<< HEAD
 		List<Members> listMember = memberRepo.getMemberInGroup(id);
 		List<UserDTO> listUserDTO = new ArrayList<UserDTO>();
-
-		for (int i = 0; i < listMember.size(); i++) {
-			Users user = userRepo.findById(listMember.get(i).getUserId()).get();
-=======
-=======
->>>>>>> parent of d815701 (add redis)
-		List<Members> listMember =  memberRepo.getMemberInGroup(id);
-		List<UserDTO> listUserDTO = new ArrayList<>();
-		for(int i = 0 ; i <listMember.size(); i++){
-			Users user = userRepo.findById(listMember.get(i).getUserId()).get();			
-<<<<<<< HEAD
->>>>>>> parent of d815701 (add redis)
-=======
->>>>>>> parent of d815701 (add redis)
-			UserDTO userDTO = modelMapper.map(user, UserDTO.class);
-			listUserDTO.add(userDTO);
+		try {
+			Map<Long, List<UserDTO>> map = userDTORedisRepo.getAllList();
+			List<List<UserDTO>> values = map.values().stream().collect(Collectors.toList());
+			if (listMember.size() == values.get(0).size()) {
+				return values.get(0);
+			}
+		} catch (Exception e) {
+			for (int i = 0; i < listMember.size(); i++) {
+				Users user = userRepo.findById(listMember.get(i).getUserId()).get();
+				UserDTO userDTO = modelMapper.map(user, UserDTO.class);
+				listUserDTO.add(userDTO);
+			}
 		}
+
+		userDTORedisRepo.createList(listUserDTO);
 		return listUserDTO;
 	}
 
@@ -148,8 +154,8 @@ public class GroupServiceImpl implements GroupService {
 
 	public Boolean checkCapacity(Long userId, Long size) {
 		StorageCapacity storageCapacity = storageCapacityRepo.findByUserId(userId);
-		if(storageCapacity.getCapacity() > storageCapacity.getUsed()+size){
-			storageCapacity.setUsed(storageCapacity.getUsed()+size);
+		if (storageCapacity.getCapacity() > storageCapacity.getUsed() + size) {
+			storageCapacity.setUsed(storageCapacity.getUsed() + size);
 			storageCapacityRepo.save(storageCapacity);
 			return true;
 		}
@@ -158,33 +164,22 @@ public class GroupServiceImpl implements GroupService {
 
 	@Override
 	public List<MemberDTO> createExcel(MultipartFile multipartFile, Long groupId, Long userId) throws IOException {
-		try{
-			if(checkCapacity(userId, multipartFile.getSize()) == false) return null;
+		try {
+			if (checkCapacity(userId, multipartFile.getSize()) == false)
+				return null;
 			ExcelService excel = new ExcelService();
 			HashMap<Integer, Users> map = new HashMap();
 			FileUploadUtil.saveFile("abc.xlsx", multipartFile);
 			String excelFilePath = "./Files/abc.xlsx";
-<<<<<<< HEAD
-<<<<<<< HEAD
 			Long user_id = (long) 1;
+			;
 			List<Book> books = excel.readExcel(excelFilePath);
+			System.out.println(books.size() + "---");
 			for (int i = 0; i < books.size() - 1; i++) {
-=======
-			Long user_id = (long) 1;;
-			List<Book> books = excel.readExcel(excelFilePath);
-			System.out.println(books.size()+"---");
-			for (int i = 0; i < books.size()-1; i++) {
->>>>>>> parent of d815701 (add redis)
-=======
-			Long user_id = (long) 1;;
-			List<Book> books = excel.readExcel(excelFilePath);
-			System.out.println(books.size()+"---");
-			for (int i = 0; i < books.size()-1; i++) {
->>>>>>> parent of d815701 (add redis)
 				user_id = Long.parseLong(userRepo.getIdUserByEmail(books.get(i).getEmail()) + "");
 				map.put(i, userRepo.findById(user_id).get());
 			}
-			Groups group = new Groups(groupRepo.findById(groupId).get().getName(), Long.parseLong(map.size()+""));
+			Groups group = new Groups(groupRepo.findById(groupId).get().getName(), Long.parseLong(map.size() + ""));
 			group.setGroupId(groupId);
 			group.setClassName(groupRepo.findById(groupId).get().getClassName());
 			group.setDescription(groupRepo.findById(groupId).get().getDescription());
@@ -198,10 +193,11 @@ public class GroupServiceImpl implements GroupService {
 				contactRepo.save(contact);
 			});
 			List<Members> listMember = memberRepo.getMemberInGroup(groupId);
-			List<MemberDTO> listMemberDTO = listMember.stream().map(element -> modelMapper.map(element, MemberDTO.class))
-			.collect(Collectors.toList());
+			List<MemberDTO> listMemberDTO = listMember.stream()
+					.map(element -> modelMapper.map(element, MemberDTO.class))
+					.collect(Collectors.toList());
 			return listMemberDTO;
-		}catch(Exception e){
+		} catch (Exception e) {
 			e.printStackTrace();
 			return null;
 		}
@@ -228,21 +224,16 @@ public class GroupServiceImpl implements GroupService {
 	@Override
 	public UserDTO getOneMemberInGroup(String email, Long groupId) {
 		Long userId = (long) userRepo.getIdUserByEmail(email);
-		memberRepo.getOneMemberInGroup(userId, groupId);
-		Users users = userRepo.findById(userId).get();
-<<<<<<< HEAD
-<<<<<<< HEAD
-		UserDTO userDTO2 = modelMapper.map(users, UserDTO.class);
-		return userDTO2;
+		UserDTO userDTO = userDTORedisRepo.get(userId);
+		if (userDTO == null) {
+			memberRepo.getOneMemberInGroup(userId, groupId);
+			Users users = userRepo.findById(userId).get();
+			UserDTO userDTO2 = modelMapper.map(users, UserDTO.class);
+			userDTORedisRepo.create(userDTO2);
+			return userDTO2;
+		}
+		return userDTO;
 
-=======
-		UserDTO userDTO = modelMapper.map(users, UserDTO.class);
-		return userDTO;
->>>>>>> parent of d815701 (add redis)
-=======
-		UserDTO userDTO = modelMapper.map(users, UserDTO.class);
-		return userDTO;
->>>>>>> parent of d815701 (add redis)
 	}
 
 	@Override
@@ -255,58 +246,72 @@ public class GroupServiceImpl implements GroupService {
 	@Override
 	public List<MemberGroupDTO> getAllGroupByStudent(Long userId) {
 		List<Members> list = memberRepo.getAllGroupByStudent(userId);
+		try {
+			Map<Long, List<MemberGroupDTO>> map = groupRedisRepo.getAllList();
+			List<List<MemberGroupDTO>> values = map.values().stream().collect(Collectors.toList());
+			if (list.size() == values.get(0).size()) {
+				return values.get(0);
+			}
+		} catch (Exception e) {
+		}
 		List<MemberGroupDTO> listDTO = new ArrayList();
-		for(int i = 0 ; i<list.size(); i++){
+		for (int i = 0; i < list.size(); i++) {
 			Groups groupOne = groupRepo.findById(list.get(i).getGroupId()).get();
-			MemberGroupDTO member = new MemberGroupDTO(groupOne.getGroupId(), groupOne.getName(), list.get(i).getIsTeacher(), groupOne.getTotalMember());
-			try{
+			MemberGroupDTO member = new MemberGroupDTO(groupOne.getGroupId(), groupOne.getName(),
+					list.get(i).getIsTeacher(), groupOne.getTotalMember());
+			try {
 				Long roomId = roomChatRepo.getRoomByGroupId(groupOne.getGroupId()).get(0).getRoomId();
 				List<Contacts> contact = contactRepo.getContactByRoomId(roomId);
 				List<ContactDTO> listContactDTO = new ArrayList<>();
-				for(int j =0; j<contact.size(); j++){
-					ContactDTO contactDTO = new ContactDTO(contact.get(j).getUser().getUserId(), contact.get(j).getUser().getFullName(), contact.get(j).getUser().getEmail(), contact.get(j).getUser().getAvatar(), contact.get(j).getUser().getStudentCode(), contact.get(j).getContactId());
+				for (int j = 0; j < contact.size(); j++) {
+					ContactDTO contactDTO = new ContactDTO(contact.get(j).getUser().getUserId(),
+							contact.get(j).getUser().getFullName(), contact.get(j).getUser().getEmail(),
+							contact.get(j).getUser().getAvatar(), contact.get(j).getUser().getStudentCode(),
+							contact.get(j).getContactId());
 					listContactDTO.add(contactDTO);
 				}
 				member.setListContact(listContactDTO);
-			}catch(Exception e){
-
+			} catch (Exception e) {
 			}
 			listDTO.add(member);
 
 		}
+
+		groupRedisRepo.createList(listDTO);
 		return listDTO;
 	}
-
 
 	@Override
 	public List<MemberGroupDTO> getAllGroupByTeacher(Long userId) {
 		List<Members> list = memberRepo.getAllGroupByTeacher(userId);
-<<<<<<< HEAD
-<<<<<<< HEAD
-=======
-		System.out.println(list.size());
->>>>>>> parent of d815701 (add redis)
-=======
-		System.out.println(list.size());
->>>>>>> parent of d815701 (add redis)
+		Map<Long, List<MemberGroupDTO>> map = groupRedisRepo.getAllList();
+		List<List<MemberGroupDTO>> values = map.values().stream().collect(Collectors.toList());
+		if (list.size() == values.get(0).size()) {
+			return values.get(0);
+		}
 		List<MemberGroupDTO> listDTO = new ArrayList();
-		for(int i = 0 ; i<list.size(); i++){
+		for (int i = 0; i < list.size(); i++) {
 			Groups groupOne = groupRepo.findById(list.get(i).getGroupId()).get();
-			MemberGroupDTO member = new MemberGroupDTO(groupOne.getGroupId(), groupOne.getName(), list.get(i).getIsTeacher(), groupOne.getTotalMember());
-			try{
+			MemberGroupDTO member = new MemberGroupDTO(groupOne.getGroupId(), groupOne.getName(),
+					list.get(i).getIsTeacher(), groupOne.getTotalMember());
+			try {
 				Long roomId = roomChatRepo.getRoomByGroupId(groupOne.getGroupId()).get(0).getRoomId();
 				List<Contacts> contact = contactRepo.getContactByRoomId(roomId);
 				List<ContactDTO> listContactDTO = new ArrayList<>();
-				for(int j =0; j<contact.size(); j++){
-					ContactDTO contactDTO = new ContactDTO(contact.get(j).getUser().getUserId(), contact.get(j).getUser().getFullName(), contact.get(j).getUser().getEmail(), contact.get(j).getUser().getAvatar(), contact.get(j).getUser().getStudentCode(), contact.get(j).getContactId());
+				for (int j = 0; j < contact.size(); j++) {
+					ContactDTO contactDTO = new ContactDTO(contact.get(j).getUser().getUserId(),
+							contact.get(j).getUser().getFullName(), contact.get(j).getUser().getEmail(),
+							contact.get(j).getUser().getAvatar(), contact.get(j).getUser().getStudentCode(),
+							contact.get(j).getContactId());
 					listContactDTO.add(contactDTO);
 				}
 				member.setListContact(listContactDTO);
-			}catch(Exception e){
+			} catch (Exception e) {
 
 			}
 			listDTO.add(member);
 		}
+		groupRedisRepo.createList(listDTO);
 		return listDTO;
 	}
 
@@ -314,7 +319,6 @@ public class GroupServiceImpl implements GroupService {
 	public Page<Groups> getAllGroupFalse(Pageable page) {
 		return groupRepo.getAllGroupFalse(page);
 	}
-
 
 	@Override
 	public MemberDTO memberJoinGroup(Long groupId, Long userId) {
@@ -327,30 +331,22 @@ public class GroupServiceImpl implements GroupService {
 	public List<MemberDTO2> getAllMemberJoinGroupFalse(Long groupId) {
 		List<Members> listMember = memberRepo.getUserJoin(groupId);
 		List<MemberDTO2> listUser = new ArrayList();
-<<<<<<< HEAD
-<<<<<<< HEAD
-
-		for (Members member : listMember) {
-			Users user = userRepo.findById(member.getUserId()).get();
-			MemberDTO2 userDTO = modelMapper.map(user, MemberDTO2.class);
-			listUser.add(userDTO);
+		try{
+			Map<Long, List<MemberDTO2>> map = memberDTO2RedisRepo.getAllList();
+			List<List<MemberDTO2>> values = map.values().stream().collect(Collectors.toList());
+			if(listMember.size() == values.get(0).size()){
+				return values.get(0);
+			}
+		}catch(Exception e){
+			for (Members member : listMember) {
+				Users user = userRepo.findById(member.getUserId()).get();
+				MemberDTO2 userDTO = modelMapper.map(user, MemberDTO2.class);
+				listUser.add(userDTO);
+			}
 		}
-
-=======
-		for (Members member : listMember) {
-			Users user =  userRepo.findById(member.getUserId()).get();
-			MemberDTO2 userDTO = modelMapper.map(user, MemberDTO2.class);
-			listUser.add(userDTO);
-		}
->>>>>>> parent of d815701 (add redis)
-=======
-		for (Members member : listMember) {
-			Users user =  userRepo.findById(member.getUserId()).get();
-			MemberDTO2 userDTO = modelMapper.map(user, MemberDTO2.class);
-			listUser.add(userDTO);
-		}
->>>>>>> parent of d815701 (add redis)
+		memberDTO2RedisRepo.createList(listUser);
 		return listUser;
+
 	}
 
 	@Override
@@ -370,40 +366,7 @@ public class GroupServiceImpl implements GroupService {
 
 	@Override
 	public void memberLeaveGroup(Long groupId, Long userId) {
-		memberRepo.memberLeaveGroup(groupId, userId);		
-<<<<<<< HEAD
-	}
-
-	@Override
-	public List<MemberGroupDTO> getAllGroupByUser(Long userId) {
-		List<Members> list = memberRepo.getAllGroupByUser(userId);
-		List<MemberGroupDTO> listDTO = new ArrayList();
-		for (int i = 0; i < list.size(); i++) {
-			Groups groupOne = groupRepo.findById(list.get(i).getGroupId()).get();
-			MemberGroupDTO member = new MemberGroupDTO(groupOne.getGroupId(), groupOne.getName(),
-					list.get(i).getIsTeacher(), groupOne.getTotalMember());
-			try {
-				System.out.println("111111");
-				Long roomId = roomChatRepo.getRoomByGroupId(groupOne.getGroupId()).get(0).getRoomId();
-				System.out.println("room id "+roomId);
-				List<Contacts> contact = contactRepo.getContactByRoomId(roomId);
-				List<ContactDTO> listContactDTO = new ArrayList<>();
-				for (int j = 0; j < contact.size(); j++) {
-					ContactDTO contactDTO = new ContactDTO(contact.get(j).getUser().getUserId(),
-							contact.get(j).getUser().getFullName(), contact.get(j).getUser().getEmail(),
-							contact.get(j).getUser().getAvatar(), contact.get(j).getUser().getStudentCode(),
-							contact.get(j).getContactId());
-					listContactDTO.add(contactDTO);
-				}
-				member.setListContact(listContactDTO);
-			} catch (Exception e) {
-			}
-			listDTO.add(member);
-
-		}
-		return listDTO;
-=======
->>>>>>> parent of d815701 (add redis)
+		memberRepo.memberLeaveGroup(groupId, userId);
 	}
 
 }
