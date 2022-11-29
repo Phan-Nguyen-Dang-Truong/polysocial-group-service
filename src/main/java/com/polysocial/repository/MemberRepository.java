@@ -24,10 +24,10 @@ public interface MemberRepository extends JpaRepository<Members, Long>{
 	@Query("SELECT o FROM Members o WHERE o.userId =?1 and o.groupId =?2 and o.confirm=1")
 	Members getOneMemberInGroup(Long userId, Long groupId);
 	
-	@Query("SELECT o FROM Members o WHERE o.userId =?1 and o.isTeacher = 0")
+	@Query("SELECT o FROM Members o WHERE o.userId =?1 and o.isTeacher = 0 and o.confirm=1")
 	List<Members> getAllGroupByStudent(Long userId);
 	
-	@Query("SELECT o FROM Members o WHERE o.userId =?1 and o.isTeacher =1")
+	@Query("SELECT o FROM Members o WHERE o.userId =?1 and o.isTeacher =1 and o.confirm=1")
 	List<Members> getAllGroupByTeacher(Long userId);
 	
 	@Query("SELECT o FROM Members o WHERE o.groupId =?1 and o.confirm=0 and o.isTeacher=0")
