@@ -21,13 +21,15 @@ public class MemberGroupDTO implements Serializable{
     private Boolean isTeacher;
     private Long totalMember;
     private String avatarGroup;
+    private Long roomId;
     private List<ContactDTO> listContact;
 
-    public MemberGroupDTO(Long groupId, String groupName, Boolean isTeacher, Long totalMember, String avatarGroup) {
+    public MemberGroupDTO(Long groupId, String groupName, Boolean isTeacher, Long totalMember, String avatarGroup, Long roomId) {
         this.groupId = groupId;
         this.groupName = groupName;
         this.isTeacher = isTeacher;
         this.totalMember = totalMember;
         this.avatarGroup = avatarGroup;
+        this.roomId = roomId;
     }
 }
