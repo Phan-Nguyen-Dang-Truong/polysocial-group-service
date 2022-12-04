@@ -1,13 +1,11 @@
 package com.polysocial.entity;
 
-import com.fasterxml.jackson.annotation.JsonManagedReference;
 import lombok.*;
 import org.hibernate.Hibernate;
 
 import javax.persistence.*;
 import java.io.Serializable;
 import java.time.LocalDateTime;
-import java.util.List;
 import java.util.Objects;
 
 @Getter
@@ -25,7 +23,17 @@ public class RoomChats implements Serializable {
     @OneToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "groupId")
     private Groups group;
+
+    private LocalDateTime lastUpdateDate = LocalDateTime.now();
+
+    private String lastMessage;
     
+
+
+    public RoomChats(Groups group) {
+        this.group = group;
+    }
+
 
     @Override
     public boolean equals(Object o) {
