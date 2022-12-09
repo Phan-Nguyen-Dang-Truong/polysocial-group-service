@@ -12,13 +12,11 @@ import com.polysocial.entity.Contacts;
 import com.polysocial.entity.Groups;
 import com.polysocial.entity.Members;
 import com.polysocial.entity.RoomChats;
-import com.polysocial.entity.StorageCapacity;
 import com.polysocial.entity.Users;
 import com.polysocial.repository.ContactRepository;
 import com.polysocial.repository.GroupRepository;
 import com.polysocial.repository.MemberRepository;
 import com.polysocial.repository.RoomChatRepository;
-import com.polysocial.repository.StorageCapacityRepo;
 import com.polysocial.repository.UserRepository;
 import com.polysocial.service.ExcelService;
 import com.polysocial.service.FileUploadUtil;
@@ -50,8 +48,6 @@ public class GroupServiceImpl implements GroupService {
 	private MemberRepository memberRepo;
 	@Autowired
 	private UserRepository userRepo;
-	@Autowired
-	private StorageCapacityRepo storageCapacityRepo;
 	@Autowired
 	private RoomChatRepository roomChatRepo;
 	@Autowired
@@ -99,6 +95,7 @@ public class GroupServiceImpl implements GroupService {
 		Groups groupEntity = modelMapper.map(group, Groups.class);
 		Groups groups = groupRepo.save(groupEntity);
 		GroupDTO groupDTO = modelMapper.map(groups, GroupDTO.class);
+		groupDTO.setGroupId(groups.getGroupId());
 		RoomChats room = new RoomChats();
 		room.setGroup(groups);
 		RoomChats roomCreate = roomChatRepo.save(room);
@@ -132,21 +129,10 @@ public class GroupServiceImpl implements GroupService {
 		return groupDTO;
 	}
 
-	public Boolean checkCapacity(Long userId, Long size) {
-		StorageCapacity storageCapacity = storageCapacityRepo.findByUserId(userId);
-		if (storageCapacity.getCapacity() > storageCapacity.getUsed() + size) {
-			storageCapacity.setUsed(storageCapacity.getUsed() + size);
-			storageCapacityRepo.save(storageCapacity);
-			return true;
-		}
-		return false;
-	}
 
 	@Override
 	public List<MemberDTO> createExcel(MultipartFile multipartFile, Long groupId, Long userId) throws IOException {
 		try {
-			if (checkCapacity(userId, multipartFile.getSize()) == false)
-				return null;
 			ExcelService excel = new ExcelService();
 			HashMap<Integer, Users> map = new HashMap();
 			FileUploadUtil.saveFile("abc.xlsx", multipartFile);
