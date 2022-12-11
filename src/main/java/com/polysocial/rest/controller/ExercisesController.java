@@ -6,6 +6,7 @@ import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestHeader;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
@@ -78,9 +79,9 @@ public class ExercisesController {
     }
 
     @GetMapping(value=ExercisesAPI.API_GET_ONE_EXERCISES)
-    public ResponseEntity getOneExercises(@RequestParam Long exId){
+    public ResponseEntity getOneExercises(@RequestParam Long exId, @RequestParam Long userId){
         try {
-            return ResponseEntity.ok(exercisesService.getOneExercises(exId));
+            return ResponseEntity.ok(exercisesService.getOneExercises(exId, userId));
         } catch(Exception ex){
             ex.printStackTrace();
             return new ResponseEntity(HttpStatus.BAD_REQUEST.toString(), HttpStatus.BAD_REQUEST);

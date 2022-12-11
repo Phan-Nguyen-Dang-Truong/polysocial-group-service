@@ -3,6 +3,7 @@ package com.polysocial.service;
 import java.util.List;
 
 import com.polysocial.dto.ExercisesDTO;
+import com.polysocial.dto.ExercisesDetailDTO;
 import com.polysocial.entity.Exercises;
 
 public interface ExercisesService {
@@ -17,6 +18,6 @@ public interface ExercisesService {
 
     List<ExercisesDTO> getAllExercises(Long groupId);
 
-    ExercisesDTO getOneExercises(Long exId);
+    ExercisesDetailDTO getOneExercises(Long exId, Long userId);
 
 }

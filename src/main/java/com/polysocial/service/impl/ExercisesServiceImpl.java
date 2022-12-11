@@ -8,14 +8,17 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import com.polysocial.dto.ExercisesDTO;
+import com.polysocial.dto.ExercisesDetailDTO;
 import com.polysocial.dto.TaskExDTO;
 import com.polysocial.entity.Exercises;
 import com.polysocial.entity.Members;
 import com.polysocial.entity.TaskEx;
+import com.polysocial.entity.TaskFile;
 import com.polysocial.repository.ExercisesRepository;
 import com.polysocial.repository.GroupRepository;
 import com.polysocial.repository.MemberRepository;
 import com.polysocial.repository.TaskExRepository;
+import com.polysocial.repository.TaskFileRepository;
 import com.polysocial.service.ExercisesService;
 
 @Service
@@ -29,6 +32,9 @@ public class ExercisesServiceImpl implements ExercisesService {
 
     @Autowired
     private TaskExRepository taskExRepo;
+
+    @Autowired
+    private TaskFileRepository taskFileRepo;
 
     @Autowired
     private ModelMapper modelMapper;
@@ -87,9 +93,19 @@ public class ExercisesServiceImpl implements ExercisesService {
     }
 
     @Override
-    public ExercisesDTO getOneExercises(Long exId) {
+    public ExercisesDetailDTO getOneExercises(Long exId, Long userId) {
         Exercises exercises = exercisesRepo.findById(exId).get();
-        ExercisesDTO exercisesDTO = modelMapper.map(exercises, ExercisesDTO.class);
+        ExercisesDetailDTO exercisesDTO = modelMapper.map(exercises, ExercisesDetailDTO.class);
+        Exercises ex = exercisesRepo.findById(exId).get();
+        try{
+            List<TaskEx> taskEx = taskExRepo.findByExIdAndUser(exId, userId);
+            TaskFile taskFile = taskFileRepo.findByTaskEx(taskEx.get(0).getTaskId());
+            exercisesDTO.setUrl(taskFile.getUrl());
+            exercisesDTO.setIsSubmit(true);
+        }catch(Exception e){
+            e.printStackTrace();
+            exercisesDTO.setIsSubmit(false);
+        }
         return exercisesDTO;
     }
 
