@@ -13,11 +13,13 @@ import com.polysocial.consts.ExercisesAPI;
 import com.polysocial.dto.ExercisesDTO;
 import com.polysocial.service.ExercisesService;
 import org.springframework.web.bind.annotation.PutMapping;
+import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 
 
 @RestController
+@CrossOrigin(origins = "*")
 public class ExercisesController {
 
     @Autowired
