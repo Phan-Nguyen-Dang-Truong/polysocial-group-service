@@ -15,4 +15,6 @@ public class TaskAPI {
 
     public static final String API_CREATE_MARK = "/api/task/create-mark";
 
+    public static final String API_GET_ALL_TASK_FILE = "/api/task/get-all-task-file";
+
 }

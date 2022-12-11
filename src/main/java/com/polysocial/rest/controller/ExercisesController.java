@@ -76,4 +76,15 @@ public class ExercisesController {
             return new ResponseEntity(HttpStatus.BAD_REQUEST.toString(), HttpStatus.BAD_REQUEST);
         }        
     }
+
+    @GetMapping(value=ExercisesAPI.API_GET_ONE_EXERCISES)
+    public ResponseEntity getOneExercises(@RequestParam Long exId){
+        try {
+            return ResponseEntity.ok(exercisesService.getOneExercises(exId));
+        } catch(Exception ex){
+            ex.printStackTrace();
+            return new ResponseEntity(HttpStatus.BAD_REQUEST.toString(), HttpStatus.BAD_REQUEST);
+        }
+
+    }
 }

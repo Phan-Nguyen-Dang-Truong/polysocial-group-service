@@ -86,5 +86,12 @@ public class ExercisesServiceImpl implements ExercisesService {
         return exercisesDTO;
     }
 
+    @Override
+    public ExercisesDTO getOneExercises(Long exId) {
+        Exercises exercises = exercisesRepo.findById(exId).get();
+        ExercisesDTO exercisesDTO = modelMapper.map(exercises, ExercisesDTO.class);
+        return exercisesDTO;
+    }
+
     
 }

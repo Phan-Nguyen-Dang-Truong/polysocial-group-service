@@ -12,4 +12,5 @@ public class ExercisesAPI {
 
     public static final String API_GET_ALL_EXERCISES = "/api/exercises/get-all-exercises";
 
+    public static final String API_GET_ONE_EXERCISES = "api/exercises/get-one";
 }

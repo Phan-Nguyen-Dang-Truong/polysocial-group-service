@@ -17,4 +17,6 @@ public interface ExercisesService {
 
     List<ExercisesDTO> getAllExercises(Long groupId);
 
+    ExercisesDTO getOneExercises(Long exId);
+
 }

@@ -5,6 +5,8 @@ import java.io.IOException;
 
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.util.ArrayList;
+import java.util.List;
 
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -13,12 +15,15 @@ import org.springframework.web.multipart.MultipartFile;
 
 import com.cloudinary.Cloudinary;
 import com.cloudinary.utils.ObjectUtils;
+import com.polysocial.dto.TaskDetailDTO;
 import com.polysocial.dto.TaskFileCreateDTO;
 import com.polysocial.dto.TaskFileDTO;
 import com.polysocial.entity.TaskEx;
 import com.polysocial.entity.TaskFile;
+import com.polysocial.entity.Users;
 import com.polysocial.repository.TaskExRepository;
 import com.polysocial.repository.TaskFileRepository;
+import com.polysocial.repository.UserRepository;
 import com.polysocial.service.FileUploadUtil;
 import com.polysocial.service.TaskFileService;
 
@@ -36,6 +41,9 @@ public class TaskFileServiceImpl implements TaskFileService {
 
 	@Autowired
 	private Cloudinary cloudinary;
+
+	@Autowired
+	private UserRepository userRepo;
 
 	@Override
 	public TaskFileDTO createTaskFile(TaskFile taskFile) {
@@ -74,5 +82,29 @@ public class TaskFileServiceImpl implements TaskFileService {
 		Long idTaskFile = taskFileRepository.findByTaskEx(taskEx.getTaskId()).getTaskFileId();
 		taskFiles.setTaskFileId(idTaskFile);
 		return taskFileRepository.save(taskFiles);
+	}
+
+	@Override
+	public List<TaskDetailDTO> getAllTaskFile(Long exId, Long groupId) {
+		List<TaskEx> list = taskExRepository.findByExIdAndGroupId(exId, groupId);
+		List<TaskDetailDTO> listTaskDetailDTO = new ArrayList<>();
+		for (TaskEx taskEx : list) {
+			Users user = userRepo.findById(taskEx.getMember().getUserId()).get();
+			TaskDetailDTO taskDetailDTO = new TaskDetailDTO();
+			taskDetailDTO.setTaskId(taskEx.getTaskId());
+			taskDetailDTO.setUserId(user.getUserId());
+			taskDetailDTO.setGroupId(taskEx.getMember().getGroupId());
+			taskDetailDTO.setExId(taskEx.getExercise().getExId());
+			taskDetailDTO.setAvatar(user.getAvatar());
+			taskDetailDTO.setFullName(user.getFullName());
+			try{
+				String url = taskFileRepository.findByTaskEx(taskEx.getTaskId()).getUrl();
+				taskDetailDTO.setUrl(url);
+			}catch(Exception e){
+				continue;
+			}
+			listTaskDetailDTO.add(taskDetailDTO);
+		}
+		return listTaskDetailDTO;
 	}
 }

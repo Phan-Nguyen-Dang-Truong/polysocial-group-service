@@ -13,6 +13,7 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.polysocial.consts.TaskAPI;
@@ -81,6 +82,16 @@ public class TaskController {
 	public ResponseEntity createMark(@RequestBody TaskExDTO task) {
 		try{
 			return ResponseEntity.ok(taskExRepo.createMark(task.getMark(), task.getExId(), task.getUserId(), task.getGroupId()));
+		}catch(Exception e){
+			e.printStackTrace();
+			return new ResponseEntity(HttpStatus.BAD_REQUEST.toString(), HttpStatus.BAD_REQUEST);
+		}
+	}
+
+	@GetMapping(value = TaskAPI.API_GET_ALL_TASK_FILE)
+	public ResponseEntity getAllTaskFile(@RequestParam Long groupId, @RequestParam Long exId){
+		try{
+			return ResponseEntity.ok(taskFileService.getAllTaskFile(exId, groupId));
 		}catch(Exception e){
 			e.printStackTrace();
 			return new ResponseEntity(HttpStatus.BAD_REQUEST.toString(), HttpStatus.BAD_REQUEST);

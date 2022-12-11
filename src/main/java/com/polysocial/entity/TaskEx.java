@@ -23,7 +23,7 @@ public class TaskEx implements Serializable {
 
     private LocalDateTime updatedDate;
 
-    private Float mark;
+    private Float mark = 0F;
 
     @ManyToOne
     @JoinColumn(name = "exId")
