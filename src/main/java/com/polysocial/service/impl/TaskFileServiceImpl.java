@@ -18,9 +18,11 @@ import com.cloudinary.utils.ObjectUtils;
 import com.polysocial.dto.TaskDetailDTO;
 import com.polysocial.dto.TaskFileCreateDTO;
 import com.polysocial.dto.TaskFileDTO;
+import com.polysocial.entity.Exercises;
 import com.polysocial.entity.TaskEx;
 import com.polysocial.entity.TaskFile;
 import com.polysocial.entity.Users;
+import com.polysocial.repository.ExercisesRepository;
 import com.polysocial.repository.TaskExRepository;
 import com.polysocial.repository.TaskFileRepository;
 import com.polysocial.repository.UserRepository;
@@ -35,6 +37,9 @@ public class TaskFileServiceImpl implements TaskFileService {
 
 	@Autowired
 	private TaskExRepository taskExRepository;
+
+	@Autowired
+	private ExercisesRepository exercisesRepository;
 
 	@Autowired
 	private ModelMapper modelMapper;
@@ -90,6 +95,7 @@ public class TaskFileServiceImpl implements TaskFileService {
 		List<TaskDetailDTO> listTaskDetailDTO = new ArrayList<>();
 		for (TaskEx taskEx : list) {
 			Users user = userRepo.findById(taskEx.getMember().getUserId()).get();
+			Exercises exercise = exercisesRepository.findById(exId).get();
 			TaskDetailDTO taskDetailDTO = new TaskDetailDTO();
 			taskDetailDTO.setTaskId(taskEx.getTaskId());
 			taskDetailDTO.setUserId(user.getUserId());
@@ -97,6 +103,8 @@ public class TaskFileServiceImpl implements TaskFileService {
 			taskDetailDTO.setExId(taskEx.getExercise().getExId());
 			taskDetailDTO.setAvatar(user.getAvatar());
 			taskDetailDTO.setFullName(user.getFullName());
+			taskDetailDTO.setContent(exercise.getContent());
+			taskDetailDTO.setEndDate(exercise.getEndDate());
 			try{
 				String url = taskFileRepository.findByTaskEx(taskEx.getTaskId()).getUrl();
 				taskDetailDTO.setUrl(url);
