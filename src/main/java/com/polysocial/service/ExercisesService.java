@@ -15,4 +15,5 @@ public interface ExercisesService {
 
     List<ExercisesDTO> getAllExercisesEndDate(Long groupId);
 
+    List<ExercisesDTO> getAllExercises(Long groupId);
 }

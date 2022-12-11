@@ -66,4 +66,12 @@ public class ExercisesController {
         }        
     }
 
+    @GetMapping(value=ExercisesAPI.API_GET_ALL_EXERCISES)
+    public ResponseEntity getAllExercises(@RequestParam Long groupId) {
+        try {
+            return ResponseEntity.ok(exercisesService.getAllExercises(groupId));
+        } catch(Exception ex) {
+            return new ResponseEntity(HttpStatus.BAD_REQUEST.toString(), HttpStatus.BAD_REQUEST);
+        }        
+    }
 }

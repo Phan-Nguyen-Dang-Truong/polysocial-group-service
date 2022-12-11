@@ -9,4 +9,6 @@ public class ExercisesAPI {
     public static final String API_DELETE_EXERCISES = "/api/exercises/delete";
 
     public static final String API_GET_ALL_EXERCISES_END_DATE = "/api/exercises/get-all-exercises-end-date";
+
+    public static final String API_GET_ALL_EXERCISES = "/api/exercises/get-all-exercises";
 }

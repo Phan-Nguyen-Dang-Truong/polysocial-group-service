@@ -78,5 +78,12 @@ public class ExercisesServiceImpl implements ExercisesService {
         List<ExercisesDTO> exercisesDTO = exercises.stream().map(exercise -> modelMapper.map(exercise, ExercisesDTO.class)).collect(Collectors.toList());
         return exercisesDTO;
     }
+
+    @Override
+    public List<ExercisesDTO> getAllExercises(Long groupId) {
+        List<Exercises> exercises =  exercisesRepo.getAllExercises(groupId);
+        List<ExercisesDTO> exercisesDTO = exercises.stream().map(exercise -> modelMapper.map(exercise, ExercisesDTO.class)).collect(Collectors.toList());
+        return exercisesDTO;
+    }
     
 }

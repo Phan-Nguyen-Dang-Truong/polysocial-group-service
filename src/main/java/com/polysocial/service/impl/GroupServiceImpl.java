@@ -141,7 +141,6 @@ public class GroupServiceImpl implements GroupService {
 			;
 			List<Book> books = excel.readExcel(excelFilePath);
 			for (int i = 0; i <= books.size() - 2; i++) {
-				System.out.println(books.get(i).getEmail());
 				user_id = Long.parseLong(userRepo.getIdUserByEmail(books.get(i).getEmail()) + "");
 				map.put(i, userRepo.findById(user_id).get());
 			}
@@ -154,7 +153,6 @@ public class GroupServiceImpl implements GroupService {
 				Members member = new Members(user.getUserId(), group.getGroupId(), false, true);
 				memberRepo.save(member);
 				Contacts contact = new Contacts(user, roomChatRepo.getRoomByGroupId(group.getGroupId()).get(0));
-
 				contactRepo.save(contact);
 			});
 			List<Members> listMember = memberRepo.getMemberInGroup(groupId);
