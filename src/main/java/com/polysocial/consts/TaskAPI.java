@@ -12,4 +12,7 @@ public class TaskAPI {
     public static final String API_GET_FILE_UPLOAD_GROUP = "/api/task/file/get-file";
 
     public static final String API_DELETE_FILE_UPLOAD = "/api/task/file/delete-file";
+
+    public static final String API_CREATE_MARK = "/api/task/create-mark";
+
 }

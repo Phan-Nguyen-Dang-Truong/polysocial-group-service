@@ -13,4 +13,7 @@ public interface TaskExService {
 
     void deleteTaskEx(Long taskId);
 
+    TaskExDTO createMark(Float mark, Long exId, Long userId, Long groupId);
+
+
 }

@@ -16,8 +16,11 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.polysocial.consts.TaskAPI;
+import com.polysocial.dto.TaskExDTO;
 import com.polysocial.dto.TaskFileCreateDTO;
 import com.polysocial.dto.TaskFileDTO;
+import com.polysocial.entity.TaskEx;
+import com.polysocial.service.TaskExService;
 import com.polysocial.service.TaskFileService;
 
 @RestController
@@ -27,6 +30,9 @@ public class TaskController {
 
 	@Autowired
 	private TaskFileService taskFileService;
+
+	@Autowired
+	private TaskExService taskExRepo;
 
 
 	@PostMapping(value = TaskAPI.API_TASK_FILE_CREATE, consumes = { "application/json" })
@@ -71,4 +77,13 @@ public class TaskController {
 		}
 	}
 	
+	@PostMapping(value = TaskAPI.API_CREATE_MARK)
+	public ResponseEntity createMark(@RequestBody TaskExDTO task) {
+		try{
+			return ResponseEntity.ok(taskExRepo.createMark(task.getMark(), task.getExId(), task.getUserId(), task.getGroupId()));
+		}catch(Exception e){
+			e.printStackTrace();
+			return new ResponseEntity(HttpStatus.BAD_REQUEST.toString(), HttpStatus.BAD_REQUEST);
+		}
+	}
 }

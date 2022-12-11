@@ -51,6 +51,15 @@ public class TaskExServiceImpl implements TaskExService {
         
     }
 
+    @Override
+    public TaskExDTO createMark(Float mark, Long exId, Long userId, Long groupId) {
+        if(mark > 10 || mark <0) mark = 0F;
+        taskExRepository.updateMark(mark, exId, userId, groupId);
+        TaskEx task = taskExRepository.findByExIdAndUserIdAndGroupId(exId, userId, groupId);
+        TaskExDTO taskExDTO = modelMapper.map(task, TaskExDTO.class);
+        return taskExDTO;
+    }
+
   
     
 }

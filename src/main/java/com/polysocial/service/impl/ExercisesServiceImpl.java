@@ -85,5 +85,6 @@ public class ExercisesServiceImpl implements ExercisesService {
         List<ExercisesDTO> exercisesDTO = exercises.stream().map(exercise -> modelMapper.map(exercise, ExercisesDTO.class)).collect(Collectors.toList());
         return exercisesDTO;
     }
+
     
 }
