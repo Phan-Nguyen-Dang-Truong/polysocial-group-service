@@ -68,9 +68,9 @@ public class TaskController {
 
 
 	@DeleteMapping(value = TaskAPI.API_DELETE_FILE_UPLOAD)
-	public ResponseEntity deleteTaskFile(@RequestBody TaskFileDTO taskFile) {
+	public ResponseEntity deleteTaskFile(@RequestParam Long taskFileId) {
 		try{
-			taskFileService.deleteTaskFile(taskFile);
+			taskFileService.deleteTaskFile(taskFileId);
 			return ResponseEntity.ok().build();
 		}catch(Exception e){
 			e.printStackTrace();

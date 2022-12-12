@@ -48,8 +48,8 @@ public class TaskFileServiceImpl implements TaskFileService {
 	}
 
 	@Override
-	public void deleteTaskFile(TaskFileDTO taskFileId) {
-		taskFileRepository.deleteById(taskFileId.getTaskFileId());
+	public void deleteTaskFile(Long taskFileId) {
+		taskFileRepository.deleteById(taskFileId);
 	}
 
 	@Override

@@ -100,7 +100,10 @@ public class ExercisesServiceImpl implements ExercisesService {
     @Override
     public ExercisesDetailDTO getOneExercises(Long exId, Long userId) {
         Exercises exercises = exercisesRepo.findById(exId).get();
+        Long taskId = taskExRepo.findByExIdAndUser(exId, userId).getTaskId();
+        Long taskFileId = taskFileRepo.findByTaskEx(taskId).getTaskFileId();
         ExercisesDetailDTO exercisesDTO = modelMapper.map(exercises, ExercisesDetailDTO.class);
+        exercisesDTO.setTaskFileId(taskFileId);
         Exercises ex = exercisesRepo.findById(exId).get();
         try{
             TaskEx taskEx = taskExRepo.findByExIdAndUser(exId, userId);

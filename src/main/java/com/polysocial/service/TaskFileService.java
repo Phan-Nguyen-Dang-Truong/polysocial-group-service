@@ -13,7 +13,7 @@ public interface TaskFileService {
     
     TaskFileDTO createTaskFile(TaskFile taskFile);
 
-    void deleteTaskFile(TaskFileDTO taskFileId);
+    void deleteTaskFile(Long taskFileId);
 
     TaskFile saveFile(TaskFileCreateDTO taskFile);
 

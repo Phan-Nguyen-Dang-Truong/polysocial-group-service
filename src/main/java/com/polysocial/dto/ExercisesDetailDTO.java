@@ -33,6 +33,8 @@ public class ExercisesDetailDTO {
 
     private Boolean isSubmit;
 
+    private Long taskFileId;
+
 
     public void formatEndDate() {
     	DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm");
