@@ -74,12 +74,13 @@ public class TaskFileServiceImpl implements TaskFileService {
 	public TaskFile updateFile(TaskFileCreateDTO taskFile) {
 		System.out.println("123");
 		String url = taskFile.getPath();
+		System.out.println(taskFile.getExId() +"-"+ taskFile.getUserId() +"-"+ taskFile.getGroupId());
 		TaskEx taskEx = taskExRepository.findByExIdAndUserIdAndGroupId(taskFile.getExId(), taskFile.getUserId(), taskFile.getGroupId());
 		String type = url.substring(url.lastIndexOf(".") + 1);
 		TaskFile taskFiles = new TaskFile(url, type, taskEx);
 		Long idTaskFile = taskFileRepository.findByTaskEx(taskEx.getTaskId()).getTaskFileId();
 		System.out.println(idTaskFile);
-		// taskFiles.setTaskFileId(idTaskFile);
+		taskFiles.setTaskFileId(idTaskFile);
 		return taskFileRepository.save(taskFiles);
 	}
 
