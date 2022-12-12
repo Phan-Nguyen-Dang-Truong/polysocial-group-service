@@ -72,9 +72,13 @@ public class ExercisesServiceImpl implements ExercisesService {
     @Override
     public void deleteOne(Long exId) {
         List<TaskEx> listTaskEx = taskExRepo.findByExerciseExId(exId);
-        for(int i = 0; i< listTaskEx.size();i++){
-            taskFileRepo.deleteByTaskTaskId(listTaskEx.get(i).getTaskId());
-            taskExRepo.deleteById(listTaskEx.get(i).getTaskId());
+        try{
+            for(int i = 0; i< listTaskEx.size();i++){
+                taskFileRepo.deleteByTaskTaskId(listTaskEx.get(i).getTaskId());
+                taskExRepo.deleteById(listTaskEx.get(i).getTaskId());
+            }   
+        }catch(Exception e){
+            e.printStackTrace();
         }
         exercisesRepo.deleteById(exId);
     }

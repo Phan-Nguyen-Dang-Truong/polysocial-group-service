@@ -50,9 +50,9 @@ public class ExercisesController {
     }
 
     @DeleteMapping(value=ExercisesAPI.API_DELETE_EXERCISES)
-    public ResponseEntity deleteExercises(@RequestBody ExercisesDTO entity) {
+    public ResponseEntity deleteExercises(@RequestParam Long exId) {
         try {
-            exercisesService.deleteOne(entity.getExId());
+            exercisesService.deleteOne(exId);
             return ResponseEntity.ok().build();
         } catch(Exception ex) {
             ex.printStackTrace();
