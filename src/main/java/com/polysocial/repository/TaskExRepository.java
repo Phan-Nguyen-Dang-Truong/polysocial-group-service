@@ -17,8 +17,10 @@ public interface TaskExRepository extends JpaRepository<TaskEx, Long> {
     @Query("SELECT o FROM TaskEx o WHERE o.exercise.exId = ?1 AND o.member.userId = ?2 AND o.member.groupId = ?3")
     TaskEx findByExIdAndUserIdAndGroupId(Long exId, Long userId, Long groupId);
 
+    List<TaskEx> findByExerciseExId(Long exId);
+
     @Query("SELECT o FROM TaskEx o WHERE o.exercise.exId = ?1 AND o.member.userId = ?2")
-    List<TaskEx> findByExIdAndUser(Long exId, Long userId);
+    TaskEx findByExIdAndUser(Long exId, Long userId);
 
     @Query("SELECT o FROM TaskEx o WHERE o.exercise.exId = ?1 AND o.member.groupId = ?2")
     List<TaskEx> findByExIdAndGroupId(Long exId, Long groupId);

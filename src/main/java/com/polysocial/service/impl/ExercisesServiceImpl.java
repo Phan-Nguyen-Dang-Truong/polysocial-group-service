@@ -70,12 +70,13 @@ public class ExercisesServiceImpl implements ExercisesService {
     }
 
     @Override
-    public ExercisesDTO deleteOne(Long exId) {
-        exercisesRepo.updatExercisesByStatuExercises(exId);
-        return exercisesRepo.findById(exId).map(exercises -> {
-            ExercisesDTO exercisesDTO = modelMapper.map(exercises, ExercisesDTO.class);
-            return exercisesDTO;
-        }).orElse(null);
+    public void deleteOne(Long exId) {
+        List<TaskEx> listTaskEx = taskExRepo.findByExerciseExId(exId);
+        for(int i = 0; i< listTaskEx.size();i++){
+            taskFileRepo.deleteByTaskTaskId(listTaskEx.get(i).getTaskId());
+            taskExRepo.deleteById(listTaskEx.get(i).getTaskId());
+        }
+        exercisesRepo.deleteById(exId);
     }
 
     @Override
@@ -98,8 +99,8 @@ public class ExercisesServiceImpl implements ExercisesService {
         ExercisesDetailDTO exercisesDTO = modelMapper.map(exercises, ExercisesDetailDTO.class);
         Exercises ex = exercisesRepo.findById(exId).get();
         try{
-            List<TaskEx> taskEx = taskExRepo.findByExIdAndUser(exId, userId);
-            TaskFile taskFile = taskFileRepo.findByTaskEx(taskEx.get(0).getTaskId());
+            TaskEx taskEx = taskExRepo.findByExIdAndUser(exId, userId);
+            TaskFile taskFile = taskFileRepo.findByTaskEx(taskEx.getTaskId());
             exercisesDTO.setUrl(taskFile.getUrl());
             exercisesDTO.setIsSubmit(true);
         }catch(Exception e){

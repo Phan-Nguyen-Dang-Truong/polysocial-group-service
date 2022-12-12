@@ -56,9 +56,10 @@ public class TaskFileServiceImpl implements TaskFileService {
 	public TaskFile saveFile(TaskFileCreateDTO taskFile) {
 		String url = taskFile.getPath();
 		TaskEx taskEx = taskExRepository.findByExIdAndUserIdAndGroupId(taskFile.getExId(), taskFile.getUserId(), taskFile.getGroupId());
+		TaskFile task_file = taskFileRepository.findByTaskEx(taskEx.getTaskId()) ;
+		if(task_file != null )  return null;
 		String type = url.substring(url.lastIndexOf(".") + 1);
 		TaskFile taskFiles = new TaskFile(url, type, taskEx);
-		System.out.println(taskFiles.getTask().getTaskId());
 		return taskFileRepository.save(taskFiles);
 	}
 
@@ -71,12 +72,14 @@ public class TaskFileServiceImpl implements TaskFileService {
 
 	@Override
 	public TaskFile updateFile(TaskFileCreateDTO taskFile) {
+		System.out.println("123");
 		String url = taskFile.getPath();
 		TaskEx taskEx = taskExRepository.findByExIdAndUserIdAndGroupId(taskFile.getExId(), taskFile.getUserId(), taskFile.getGroupId());
 		String type = url.substring(url.lastIndexOf(".") + 1);
 		TaskFile taskFiles = new TaskFile(url, type, taskEx);
 		Long idTaskFile = taskFileRepository.findByTaskEx(taskEx.getTaskId()).getTaskFileId();
-		taskFiles.setTaskFileId(idTaskFile);
+		System.out.println(idTaskFile);
+		// taskFiles.setTaskFileId(idTaskFile);
 		return taskFileRepository.save(taskFiles);
 	}
 

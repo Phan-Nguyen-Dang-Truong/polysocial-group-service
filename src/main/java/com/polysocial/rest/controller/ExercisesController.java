@@ -52,8 +52,8 @@ public class ExercisesController {
     @DeleteMapping(value=ExercisesAPI.API_DELETE_EXERCISES)
     public ResponseEntity deleteExercises(@RequestBody ExercisesDTO entity) {
         try {
-            ExercisesDTO exercises = exercisesService.deleteOne(entity.getExId());
-            return ResponseEntity.ok(exercises);
+            exercisesService.deleteOne(entity.getExId());
+            return ResponseEntity.ok().build();
         } catch(Exception ex) {
             ex.printStackTrace();
             return new ResponseEntity(HttpStatus.BAD_REQUEST.toString(), HttpStatus.BAD_REQUEST);

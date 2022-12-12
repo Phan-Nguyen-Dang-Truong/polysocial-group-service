@@ -12,7 +12,7 @@ public interface ExercisesService {
 
     ExercisesDTO updateOne(ExercisesDTO exercise);
 
-    ExercisesDTO deleteOne(Long exId);
+    void deleteOne(Long exId);
 
     List<ExercisesDTO> getAllExercisesEndDate(Long groupId);
 
