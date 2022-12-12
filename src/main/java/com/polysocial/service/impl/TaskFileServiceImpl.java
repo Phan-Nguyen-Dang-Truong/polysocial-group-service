@@ -1,20 +1,12 @@
 package com.polysocial.service.impl;
 
-import java.io.File;
-import java.io.IOException;
-
-import java.nio.file.Path;
-import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.List;
 
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-import org.springframework.web.multipart.MultipartFile;
-
 import com.cloudinary.Cloudinary;
-import com.cloudinary.utils.ObjectUtils;
 import com.polysocial.dto.TaskDetailDTO;
 import com.polysocial.dto.TaskFileCreateDTO;
 import com.polysocial.dto.TaskFileDTO;
@@ -26,7 +18,6 @@ import com.polysocial.repository.ExercisesRepository;
 import com.polysocial.repository.TaskExRepository;
 import com.polysocial.repository.TaskFileRepository;
 import com.polysocial.repository.UserRepository;
-import com.polysocial.service.FileUploadUtil;
 import com.polysocial.service.TaskFileService;
 
 @Service
@@ -105,6 +96,7 @@ public class TaskFileServiceImpl implements TaskFileService {
 			taskDetailDTO.setFullName(user.getFullName());
 			taskDetailDTO.setContent(exercise.getContent());
 			taskDetailDTO.setEndDate(exercise.getEndDate());
+			taskDetailDTO.setCreatedDate(taskEx.getCreatedDate());
 			try{
 				String url = taskFileRepository.findByTaskEx(taskEx.getTaskId()).getUrl();
 				taskDetailDTO.setUrl(url);

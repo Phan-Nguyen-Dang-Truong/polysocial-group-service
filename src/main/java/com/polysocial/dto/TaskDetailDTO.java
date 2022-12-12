@@ -1,6 +1,7 @@
 package com.polysocial.dto;
 
 import java.io.Serializable;
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
@@ -25,4 +26,5 @@ public class TaskDetailDTO implements Serializable{
     private String avatar;
     private String content;
     private LocalDateTime endDate;;
+    private LocalDateTime createdDate;
 }
