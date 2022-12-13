@@ -68,7 +68,7 @@ public class TaskExServiceImpl implements TaskExService {
         List<TaskEx> taskExs = taskExRepository.findByUserId(userId);
         List<TaskExDetailDTO> taskExDTOs = new ArrayList<>();
         for(int i = 0 ; i < taskExs.size(); i++) {
-            TaskExDetailDTO taskExDTO = new TaskExDetailDTO(taskExs.get(i).getTaskId(), taskExs.get(i).getExercise().getExId(), userId,taskExs.get(i).getExercise().getGroup().getGroupId(), taskExs.get(0).getExercise().getContent(), taskExs.get(0).getExercise().getEndDate());
+            TaskExDetailDTO taskExDTO = new TaskExDetailDTO(taskExs.get(i).getTaskId(), taskExs.get(i).getExercise().getExId(), userId,taskExs.get(i).getExercise().getGroup().getGroupId(), taskExs.get(i).getExercise().getContent(), taskExs.get(i).getExercise().getEndDate());
             taskExDTOs.add(taskExDTO);
         }
         return taskExDTOs;

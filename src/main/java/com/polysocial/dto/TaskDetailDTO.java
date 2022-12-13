@@ -27,4 +27,5 @@ public class TaskDetailDTO implements Serializable{
     private String content;
     private LocalDateTime endDate;;
     private LocalDateTime createdDate;
+    private Float mark = 0.0F;
 }

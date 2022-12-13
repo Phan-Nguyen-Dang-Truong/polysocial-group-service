@@ -101,6 +101,7 @@ public class TaskFileServiceImpl implements TaskFileService {
 			taskDetailDTO.setContent(exercise.getContent());
 			taskDetailDTO.setEndDate(exercise.getEndDate());
 			taskDetailDTO.setCreatedDate(taskEx.getCreatedDate());
+			taskDetailDTO.setMark(taskEx.getMark());
 			try{
 				String url = taskFileRepository.findByTaskEx(taskEx.getTaskId()).getUrl();
 				taskDetailDTO.setUrl(url);
