@@ -7,6 +7,8 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.nio.file.StandardCopyOption;
+import java.util.ArrayList;
+import java.util.List;
 
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -58,6 +60,17 @@ public class TaskExServiceImpl implements TaskExService {
         TaskEx task = taskExRepository.findByExIdAndUserIdAndGroupId(exId, userId, groupId);
         TaskExDTO taskExDTO = modelMapper.map(task, TaskExDTO.class);
         return taskExDTO;
+    }
+
+    @Override
+    public List<TaskExDTO> getAllTaskExByUserId(Long userId) {
+        List<TaskEx> taskExs = taskExRepository.findByUserId(userId);
+        List<TaskExDTO> taskExDTOs = new ArrayList<>();
+        for (TaskEx taskEx : taskExs) {
+            TaskExDTO taskExDTO = modelMapper.map(taskEx, TaskExDTO.class);
+            taskExDTOs.add(taskExDTO);
+        }
+        return taskExDTOs;
     }
 
   

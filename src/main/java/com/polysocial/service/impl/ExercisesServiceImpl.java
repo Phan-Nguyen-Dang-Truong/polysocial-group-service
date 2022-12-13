@@ -116,6 +116,5 @@ public class ExercisesServiceImpl implements ExercisesService {
         }
         return exercisesDTO;
     }
-
     
 }

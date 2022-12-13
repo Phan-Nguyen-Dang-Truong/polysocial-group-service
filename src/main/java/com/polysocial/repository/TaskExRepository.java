@@ -30,5 +30,7 @@ public interface TaskExRepository extends JpaRepository<TaskEx, Long> {
     @Query("UPDATE TaskEx o SET o.mark = ?1 WHERE o.exercise.exId = ?2 AND o.member.userId = ?3 AND o.member.groupId = ?4")
     void updateMark(Float mark, Long exId, Long userId, Long groupId);
 
+    @Query("SELECT o FROM TaskEx o WHERE o.member.userId =?1")
+    List<TaskEx> findByUserId(Long userId);
 
 }

@@ -1,7 +1,7 @@
 package com.polysocial.rest.controller;
 
 import java.io.IOException;
-
+import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -92,6 +92,17 @@ public class TaskController {
 	public ResponseEntity getAllTaskFile(@RequestParam Long groupId, @RequestParam Long exId){
 		try{
 			return ResponseEntity.ok(taskFileService.getAllTaskFile(exId, groupId));
+		}catch(Exception e){
+			e.printStackTrace();
+			return new ResponseEntity(HttpStatus.BAD_REQUEST.toString(), HttpStatus.BAD_REQUEST);
+		}
+	}
+
+	@GetMapping(value = TaskAPI.API_GET_ALL_TASK_EX)
+	public ResponseEntity getAllTaskEx(@RequestParam Long userId){
+		try{
+			List<TaskExDTO> taskExs = taskExRepo.getAllTaskExByUserId(userId);
+			return ResponseEntity.ok(taskExs);
 		}catch(Exception e){
 			e.printStackTrace();
 			return new ResponseEntity(HttpStatus.BAD_REQUEST.toString(), HttpStatus.BAD_REQUEST);

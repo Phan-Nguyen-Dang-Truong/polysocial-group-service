@@ -1,5 +1,7 @@
 package com.polysocial.service;
 
+import java.util.List;
+
 import com.polysocial.dto.TaskExDTO;
 import com.polysocial.entity.TaskEx;
 
@@ -13,4 +15,5 @@ public interface TaskExService {
 
     TaskExDTO createMark(Float mark, Long exId, Long userId, Long groupId);
 
+    List<TaskExDTO> getAllTaskExByUserId(Long userId);
 }
