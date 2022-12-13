@@ -18,6 +18,7 @@ import org.springframework.web.multipart.MultipartFile;
 import com.cloudinary.Cloudinary;
 import com.cloudinary.utils.ObjectUtils;
 import com.polysocial.dto.TaskExDTO;
+import com.polysocial.dto.TaskExDetailDTO;
 import com.polysocial.entity.FileSave;
 import com.polysocial.entity.TaskEx;
 import com.polysocial.repository.TaskExRepository;
@@ -63,11 +64,11 @@ public class TaskExServiceImpl implements TaskExService {
     }
 
     @Override
-    public List<TaskExDTO> getAllTaskExByUserId(Long userId) {
+    public List<TaskExDetailDTO> getAllTaskExByUserId(Long userId) {
         List<TaskEx> taskExs = taskExRepository.findByUserId(userId);
-        List<TaskExDTO> taskExDTOs = new ArrayList<>();
-        for (TaskEx taskEx : taskExs) {
-            TaskExDTO taskExDTO = modelMapper.map(taskEx, TaskExDTO.class);
+        List<TaskExDetailDTO> taskExDTOs = new ArrayList<>();
+        for(int i = 0 ; i < taskExs.size(); i++) {
+            TaskExDetailDTO taskExDTO = new TaskExDetailDTO(taskExs.get(i).getTaskId(), taskExs.get(i).getExercise().getExId(), userId,taskExs.get(i).getExercise().getGroup().getGroupId(), taskExs.get(0).getExercise().getContent(), taskExs.get(0).getExercise().getEndDate());
             taskExDTOs.add(taskExDTO);
         }
         return taskExDTOs;

@@ -18,6 +18,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 import com.polysocial.consts.TaskAPI;
 import com.polysocial.dto.TaskExDTO;
+import com.polysocial.dto.TaskExDetailDTO;
 import com.polysocial.dto.TaskFileCreateDTO;
 import com.polysocial.dto.TaskFileDTO;
 import com.polysocial.entity.TaskEx;
@@ -101,7 +102,7 @@ public class TaskController {
 	@GetMapping(value = TaskAPI.API_GET_ALL_TASK_EX)
 	public ResponseEntity getAllTaskEx(@RequestParam Long userId){
 		try{
-			List<TaskExDTO> taskExs = taskExRepo.getAllTaskExByUserId(userId);
+			List<TaskExDetailDTO> taskExs = taskExRepo.getAllTaskExByUserId(userId);
 			return ResponseEntity.ok(taskExs);
 		}catch(Exception e){
 			e.printStackTrace();

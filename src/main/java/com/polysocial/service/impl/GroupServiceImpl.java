@@ -98,7 +98,9 @@ public class GroupServiceImpl implements GroupService {
 		groupDTO.setGroupId(groups.getGroupId());
 		RoomChats room = new RoomChats();
 		room.setGroup(groups);
+		room.setLastMessage("Có thành viên vừa tham gia vào nhóm");
 		RoomChats roomCreate = roomChatRepo.save(room);
+
 		Contacts contact = new Contacts();
 		contact.setRoom(roomCreate);
 		contact.setUser(userRepo.findById(group.getAdminId()).get());
