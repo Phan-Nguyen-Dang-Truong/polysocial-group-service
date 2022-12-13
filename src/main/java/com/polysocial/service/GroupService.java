@@ -47,7 +47,7 @@ public interface GroupService {
     
     List<MemberDTO> createExcel(MultipartFile multipartFile, Long groupId, Long userId) throws IOException;
     
-    List<GroupDTO> findByKeywork(String keywork);
+    List<GroupDTO> findByKeywork(String keywork, Long userId);
     
     MemberDTO saveMember(StudentDTO user);
     

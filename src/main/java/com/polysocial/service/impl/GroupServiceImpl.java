@@ -97,9 +97,10 @@ public class GroupServiceImpl implements GroupService {
 		GroupDTO groupDTO = modelMapper.map(groups, GroupDTO.class);
 		groupDTO.setGroupId(groups.getGroupId());
 		RoomChats room = new RoomChats();
+		room.setLastMessage("Có thành viên vừa tham gia nhóm");
 		room.setGroup(groups);
-		room.setLastMessage("Có thành viên vừa tham gia vào nhóm");
 		RoomChats roomCreate = roomChatRepo.save(room);
+		
 
 		Contacts contact = new Contacts();
 		contact.setRoom(roomCreate);
@@ -181,10 +182,18 @@ public class GroupServiceImpl implements GroupService {
 	}
 
 	@Override
-	public List<GroupDTO> findByKeywork(String keywork) {
+	public List<GroupDTO> findByKeywork(String keywork, Long userId) {
 		List<Groups> groups = groupRepo.findByGroupName(keywork);
 		List<GroupDTO> groupDTO = groups.stream().map(group -> modelMapper.map(group, GroupDTO.class))
 				.collect(Collectors.toList());
+		List<Members> listMember = memberRepo.getAllGroupByUser(userId);
+		for (int i = 0; i < groupDTO.size(); i++) {
+			for (int j = 0; j < listMember.size(); j++) {
+				if(listMember.get(j).getGroupId() == groupDTO.get(i).getGroupId()) {
+					groupDTO.remove(i);
+				}
+			}
+		}
 		return groupDTO;
 	}
 

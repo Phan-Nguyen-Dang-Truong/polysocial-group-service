@@ -33,6 +33,9 @@ public class Groups implements Serializable {
     private LocalDateTime createdDate = LocalDateTime.now();
 
     private String avatar;
+
+    @OneToMany(mappedBy = "group")
+    private List<Members> members;
     
 
     public Groups(String name, Long totalMember) {

@@ -7,6 +7,8 @@ import org.hibernate.Hibernate;
 import javax.persistence.Entity;
 import javax.persistence.Id;
 import javax.persistence.IdClass;
+import javax.persistence.JoinColumn;
+import javax.persistence.ManyToOne;
 import javax.persistence.OneToMany;
 import java.io.Serializable;
 import java.util.List;
@@ -30,7 +32,18 @@ public class Members implements Serializable {
 
     private Boolean confirm ;
 
+    @ManyToOne
+    @JoinColumn(name = "groupId", insertable = false, updatable = false)
+    private Groups group;
 
+
+
+    public Members(Long userId, Long groupId, Boolean isTeacher, Boolean confirm) {
+        this.userId = userId;
+        this.groupId = groupId;
+        this.isTeacher = isTeacher;
+        this.confirm = confirm;
+    }
     
 
     @Override

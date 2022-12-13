@@ -136,9 +136,9 @@ public class GroupController {
     }
     
     @GetMapping(GroupAPI.API_FIND_GROUP)
-    public ResponseEntity findGroup(@RequestParam(required = false, name="keywork")	 String keyword){
+    public ResponseEntity findGroup(@RequestParam(required = false, name="keywork")	 String keyword, @RequestParam Long userId){
     	try {
-    		List<GroupDTO> list = groupBusiness.findByKeywork(keyword);
+    		List<GroupDTO> list = groupBusiness.findByKeywork(keyword, userId);
     		return ResponseEntity.ok(list);
     	}catch(Exception e) {
     		return new ResponseEntity(HttpStatus.BAD_REQUEST.toString(), HttpStatus.BAD_REQUEST);
