@@ -17,4 +17,6 @@ public interface TaskExService {
     TaskExDTO createMark(Float mark, Long exId, Long userId, Long groupId);
 
     List<TaskExDetailDTO> getAllTaskExByUserId(Long userId);
+
+    List<TaskExDTO> getAllTaskExByEx(Long exId);
 }

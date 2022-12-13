@@ -109,4 +109,15 @@ public class TaskController {
 			return new ResponseEntity(HttpStatus.BAD_REQUEST.toString(), HttpStatus.BAD_REQUEST);
 		}
 	}
+
+	@GetMapping(value = TaskAPI.API_GET_ALL_TASK_EX_BY_EX)
+	public ResponseEntity getTaskEx(@RequestParam Long exId){
+		try{
+			List<TaskExDTO> taskEx = taskExRepo.getAllTaskExByEx(exId);
+			return ResponseEntity.ok(taskEx);
+		}catch(Exception e){
+			e.printStackTrace();
+			return new ResponseEntity(HttpStatus.BAD_REQUEST.toString(), HttpStatus.BAD_REQUEST);
+		}
+	}
 }

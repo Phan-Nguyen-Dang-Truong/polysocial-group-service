@@ -54,6 +54,7 @@ public class ExercisesServiceImpl implements ExercisesService {
             TaskEx taskEx = modelMapper.map(taskExDTO, TaskEx.class);
             taskEx.setMember(member);
             taskEx.setExercise(exercises);
+            taskEx.setMark(0F);
             taskExRepo.save(taskEx);
         }
         ExercisesDTO exercisesDTO = modelMapper.map(exercises, ExercisesDTO.class);

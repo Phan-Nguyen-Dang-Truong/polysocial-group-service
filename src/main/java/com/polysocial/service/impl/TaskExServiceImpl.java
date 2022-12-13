@@ -74,6 +74,17 @@ public class TaskExServiceImpl implements TaskExService {
         return taskExDTOs;
     }
 
+    @Override
+    public List<TaskExDTO> getAllTaskExByEx(Long exId) {
+        List<TaskEx> taskExs = taskExRepository.findByExerciseExId(exId);
+        List<TaskExDTO> taskExDTOs = new ArrayList<>();
+        for(int i = 0 ; i < taskExs.size(); i++) {
+            TaskExDTO taskExDTO = modelMapper.map(taskExs.get(i), TaskExDTO.class);
+            taskExDTOs.add(taskExDTO);
+        }
+        return taskExDTOs;
+    }
+
   
     
 }
