@@ -24,6 +24,7 @@ import com.polysocial.service.GroupService;
 
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Base64;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -98,6 +99,10 @@ public class GroupServiceImpl implements GroupService {
 		groupDTO.setGroupId(groups.getGroupId());
 		RoomChats room = new RoomChats();
 		room.setLastMessage("Có thành viên vừa tham gia nhóm");
+		//encodedString
+		String encodedString = Base64.getEncoder().encodeToString(room.getLastMessage().getBytes());
+		room.setLastMessage(encodedString);
+		
 		room.setGroup(groups);
 		RoomChats roomCreate = roomChatRepo.save(room);
 		
