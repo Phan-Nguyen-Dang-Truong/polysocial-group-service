@@ -3,6 +3,8 @@ package com.polysocial.entity;
 import lombok.*;
 import org.hibernate.Hibernate;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
+
 import javax.persistence.*;
 import java.io.Serializable;
 import java.time.LocalDateTime;
@@ -34,6 +36,7 @@ public class Groups implements Serializable {
 
     private String avatar;
 
+    @JsonIgnore
     @OneToMany(mappedBy = "group")
     private List<Members> members;
     
