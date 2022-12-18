@@ -63,6 +63,15 @@ public class GroupServiceImpl implements GroupService {
 	public GroupDTO getOne(Long id) {
 		Groups group = groupRepo.getGroup(id);
 		GroupDTO groupDTO = modelMapper.map(group, GroupDTO.class);
+		Long roomId = roomChatRepo.getRoomByGroupId(id).get(0).getRoomId();
+		groupDTO.setRoomId(roomId);
+		List<Contacts> listContact = contactRepo.getContactByRoomId(roomId);
+		List<ContactDTO> listContactDTO = listContact.stream().map(contact -> {
+			Users user = userRepo.findById(contact.getUser().getUserId()).get();
+			ContactDTO contactDTO = modelMapper.map(user, ContactDTO.class);
+			return contactDTO;
+		}).collect(Collectors.toList());
+		groupDTO.setListContact(listContactDTO);
 		return groupDTO;
 	}
 

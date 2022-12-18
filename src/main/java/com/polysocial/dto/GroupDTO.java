@@ -6,6 +6,7 @@ import lombok.Data;
 
 import java.io.Serializable;
 import java.time.LocalDateTime;
+import java.util.List;
 
 @Data
 @JsonIgnoreProperties(ignoreUnknown = true)
@@ -29,4 +30,8 @@ public class GroupDTO implements Serializable {
     private Long adminId;
 
     private String avatar;
+
+    private List<ContactDTO> listContact;
+
+    private Long roomId;
 }
