@@ -247,6 +247,7 @@ public class GroupServiceImpl implements GroupService {
 			Long roomChatId = roomChatRepo.getRoomByGroupId(groupOne.getGroupId()).get(0).getRoomId();
 			MemberGroupDTO member = new MemberGroupDTO(groupOne.getGroupId(), groupOne.getName(),
 					list.get(i).getIsTeacher(), groupOne.getTotalMember(), groupOne.getAvatar(), roomChatId);
+			member.setClassName(groupOne.getClassName());
 			try {
 				Long roomId = roomChatRepo.getRoomByGroupId(groupOne.getGroupId()).get(0).getRoomId();
 				List<Contacts> contact = contactRepo.getContactByRoomId(roomId);
@@ -278,6 +279,7 @@ public class GroupServiceImpl implements GroupService {
 			Long roomChatId = roomChatRepo.getRoomByGroupId(groupOne.getGroupId()).get(0).getRoomId();
 			MemberGroupDTO member = new MemberGroupDTO(groupOne.getGroupId(), groupOne.getName(),
 					list.get(i).getIsTeacher(), groupOne.getTotalMember(), groupOne.getAvatar(), roomChatId);
+			member.setClassName(groupOne.getClassName());
 			try {
 				Long roomId = roomChatRepo.getRoomByGroupId(groupOne.getGroupId()).get(0).getRoomId();
 				List<Contacts> contact = contactRepo.getContactByRoomId(roomId);
@@ -362,6 +364,7 @@ public class GroupServiceImpl implements GroupService {
 			Long roomChatId = roomChatRepo.getRoomByGroupId(groupOne.getGroupId()).get(0).getRoomId();
 			MemberGroupDTO member = new MemberGroupDTO(groupOne.getGroupId(), groupOne.getName(),
 					list.get(i).getIsTeacher(), groupOne.getTotalMember(), groupOne.getAvatar(), roomChatId);
+			member.setClassName(groupOne.getClassName());
 			try {
 				Long roomId = roomChatRepo.getRoomByGroupId(groupOne.getGroupId()).get(0).getRoomId();
 				List<Contacts> contact = contactRepo.getContactByRoomId(roomId);

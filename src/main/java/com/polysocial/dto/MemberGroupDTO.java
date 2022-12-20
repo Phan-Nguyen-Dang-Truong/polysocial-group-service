@@ -20,6 +20,7 @@ public class MemberGroupDTO implements Serializable{
     private String groupName;
     private Boolean isTeacher;
     private Long totalMember;
+    private String className;
     private String avatarGroup;
     private Long roomId;
     private List<ContactDTO> listContact;
