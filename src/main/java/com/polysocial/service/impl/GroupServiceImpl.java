@@ -79,6 +79,8 @@ public class GroupServiceImpl implements GroupService {
 	public void addMemberToGroup(Users user, Groups group) {
 		Members member = new Members(user.getUserId(), group.getGroupId(), false, true);
 		memberRepo.save(member);
+		group.setTotalMember(memberRepo.countMemberInGroup(group.getGroupId()));
+		groupRepo.save(group);
 
 	}
 
@@ -229,8 +231,9 @@ public class GroupServiceImpl implements GroupService {
 		Members member = new Members(user.getUserId(), user.getGroupId(), false, true);
 		MemberDTO memberDTO = modelMapper.map(memberRepo.save(member), MemberDTO.class);
 		Groups group = groupRepo.findById(user.getGroupId()).get();
-		group.setTotalMember(group.getTotalMember() + 1);
+		group.setTotalMember(memberRepo.countMemberInGroup(group.getGroupId()));
 		groupRepo.save(group);
+
 		return memberDTO;
 	}
 
@@ -304,6 +307,9 @@ public class GroupServiceImpl implements GroupService {
 	public MemberDTO memberJoinGroup(Long groupId, Long userId) {
 		Members member = new Members(userId, groupId, false, false);
 		MemberDTO memberDTO = modelMapper.map(memberRepo.save(member), MemberDTO.class);
+		Groups group = groupRepo.findById(groupId).get();
+		group.setTotalMember(memberRepo.countMemberInGroup(groupId));
+		groupRepo.save(group);
 		return memberDTO;
 	}
 
@@ -325,6 +331,9 @@ public class GroupServiceImpl implements GroupService {
 		memberRepo.confirmUser(groupId, userId);
 		Users user = userRepo.findById(userId).get();
 		UserDTO userDTO = modelMapper.map(user, UserDTO.class);
+		Groups group = groupRepo.findById(groupId).get();
+		group.setTotalMember(memberRepo.countMemberInGroup(group.getGroupId()));
+		groupRepo.save(group);
 		return userDTO;
 	}
 
@@ -338,6 +347,10 @@ public class GroupServiceImpl implements GroupService {
 	@Override
 	public void memberLeaveGroup(Long groupId, Long userId) {
 		memberRepo.memberLeaveGroup(groupId, userId);
+		Groups group = groupRepo.findById(groupId).get();
+		group.setTotalMember(memberRepo.countMemberInGroup(group.getGroupId()));
+		groupRepo.save(group);
+
 	}
 
 	@Override

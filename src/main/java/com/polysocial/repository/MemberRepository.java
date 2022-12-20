@@ -50,4 +50,7 @@ public interface MemberRepository extends JpaRepository<Members, Long>{
 
 	@Query("SELECT o FROM Members o WHERE o.userId =?1 and o.confirm=1")
 	List<Members> getAllGroupByUser(Long userId);
+
+	@Query("SELECT count(o) FROM Members o WHERE o.groupId =?1 and o.confirm=1")
+	Long countMemberInGroup(Long groupId);
 }
