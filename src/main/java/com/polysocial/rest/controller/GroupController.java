@@ -141,6 +141,7 @@ public class GroupController {
     		List<GroupDTO> list = groupBusiness.findByKeywork(keyword, userId);
     		return ResponseEntity.ok(list);
     	}catch(Exception e) {
+			e.printStackTrace();
     		return new ResponseEntity(HttpStatus.BAD_REQUEST.toString(), HttpStatus.BAD_REQUEST);
 
     	}

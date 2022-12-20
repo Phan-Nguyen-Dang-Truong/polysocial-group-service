@@ -198,15 +198,21 @@ public class GroupServiceImpl implements GroupService {
 	@Override
 	public List<GroupDTO> findByKeywork(String keywork, Long userId) {
 		List<Groups> groups = groupRepo.findByGroupName(keywork);
+		System.out.println(groups.size());
 		List<GroupDTO> groupDTO = groups.stream().map(group -> modelMapper.map(group, GroupDTO.class))
 				.collect(Collectors.toList());
+				System.out.println(groupDTO.size());
 		List<Members> listMember = memberRepo.getAllGroupByUser(userId);
-		for (int i = 0; i < groupDTO.size(); i++) {
-			for (int j = 0; j < listMember.size(); j++) {
-				if(listMember.get(j).getGroupId() == groupDTO.get(i).getGroupId()) {
-					groupDTO.remove(i);
+		try{
+			for (int i = 0; i < groupDTO.size(); i++) {
+				for (int j = 0; j < listMember.size(); j++) {
+					if(listMember.get(j).getGroupId() == groupDTO.get(i).getGroupId()) {
+						// groupDTO.remove(i);
+					}
 				}
 			}
+		}catch(Exception e){
+
 		}
 		return groupDTO;
 	}
