@@ -161,10 +161,7 @@ public class GroupServiceImpl implements GroupService {
 				user_id = Long.parseLong(userRepo.getIdUserByEmail(books.get(i).getEmail()) + "");
 				map.put(i, userRepo.findById(user_id).get());
 			}
-			Groups group = new Groups(groupRepo.findById(groupId).get().getName(), Long.parseLong(map.size() + ""));
-			group.setGroupId(groupId);
-			group.setClassName(groupRepo.findById(groupId).get().getClassName());
-			group.setDescription(groupRepo.findById(groupId).get().getDescription());
+			Groups group = modelMapper.map(groupRepo.findById(groupId),Groups.class);
 			map.entrySet().forEach(entry -> {
 				Users user = entry.getValue();
 				Members member = new Members(user.getUserId(), group.getGroupId(), false, true);
