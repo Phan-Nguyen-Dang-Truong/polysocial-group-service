@@ -201,13 +201,12 @@ public class GroupServiceImpl implements GroupService {
 		System.out.println(groups.size());
 		List<GroupDTO> groupDTO = groups.stream().map(group -> modelMapper.map(group, GroupDTO.class))
 				.collect(Collectors.toList());
-				System.out.println(groupDTO.size());
 		List<Members> listMember = memberRepo.getAllGroupByUser(userId);
 		try{
 			for (int i = 0; i < groupDTO.size(); i++) {
 				for (int j = 0; j < listMember.size(); j++) {
 					if(listMember.get(j).getGroupId() == groupDTO.get(i).getGroupId()) {
-						// groupDTO.remove(i);
+						groupDTO.remove(i);
 					}
 				}
 			}
