@@ -18,7 +18,7 @@ public interface GroupRepository extends JpaRepository<Groups, Long> {
 	@Query("SELECT o FROM Groups o WHERE o.status = 1 and o.totalMember is not null")
 	Page<Groups> getAll(Pageable page);
 	
-	@Query("SELECT o FROM Groups o WHERE o.name LIKE %?1% and o.totalMember not like 0")
+	@Query("SELECT o FROM Groups o WHERE o.name LIKE %?1% and o.totalMember is not null")
 	List<Groups> findByGroupName(String name);
 	
 	
