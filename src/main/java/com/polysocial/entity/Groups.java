@@ -24,7 +24,7 @@ public class Groups implements Serializable {
 
     private String name;
 
-    private Long totalMember = 1L;
+    private Long totalMember = 0L;
 
     private String description;
 
