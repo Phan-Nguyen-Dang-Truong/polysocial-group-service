@@ -37,6 +37,8 @@ public class Contacts implements Serializable {
     @ToString.Exclude
     private List<Messages> message;
 
+    private Boolean status = true;
+
 
 
     public Contacts( Users user, RoomChats room) {

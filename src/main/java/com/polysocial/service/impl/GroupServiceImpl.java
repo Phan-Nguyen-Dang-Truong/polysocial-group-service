@@ -119,13 +119,12 @@ public class GroupServiceImpl implements GroupService {
 		groupDTO.setGroupId(groups.getGroupId());
 		RoomChats room = new RoomChats();
 		room.setLastMessage("Có thành viên vừa tham gia nhóm");
-		//encodedString
+		// encodedString
 		String encodedString = Base64.getEncoder().encodeToString(room.getLastMessage().getBytes());
 		room.setLastMessage(encodedString);
-		
+
 		room.setGroup(groups);
 		RoomChats roomCreate = roomChatRepo.save(room);
-		
 
 		Contacts contact = new Contacts();
 		contact.setRoom(roomCreate);
@@ -136,14 +135,14 @@ public class GroupServiceImpl implements GroupService {
 		Messages message = new Messages();
 		message.setContact(contactCreated);
 		message.setStatus(true);
-		String encodedStringContent = Base64.getEncoder().encodeToString((userRepo.findById(group.getAdminId()).get().getFullName()+" đã tham gia nhóm").getBytes());
+		String encodedStringContent = Base64.getEncoder().encodeToString(
+				(userRepo.findById(group.getAdminId()).get().getFullName() + " đã tham gia nhóm").getBytes());
 		message.setContent(encodedStringContent);
 		messageRepo.save(message);
 
 		ViewedStatus viewedStatus = new ViewedStatus();
 		viewedStatus.setContactId(contactCreated.getContactId());
 		viewedStatusRepo.save(viewedStatus);
-
 
 		Members member = new Members(group.getAdminId(), groupDTO.getGroupId(), true, true);
 		memberRepo.save(member);
@@ -170,7 +169,6 @@ public class GroupServiceImpl implements GroupService {
 		return groupDTO;
 	}
 
-
 	@Override
 	public List<MemberDTO> createExcel(MultipartFile multipartFile, Long groupId, Long userId) throws IOException {
 		try {
@@ -185,7 +183,7 @@ public class GroupServiceImpl implements GroupService {
 				user_id = Long.parseLong(userRepo.getIdUserByEmail(books.get(i).getEmail()) + "");
 				map.put(i, userRepo.findById(user_id).get());
 			}
-			Groups group = modelMapper.map(groupRepo.findById(groupId),Groups.class);
+			Groups group = modelMapper.map(groupRepo.findById(groupId), Groups.class);
 			map.entrySet().forEach(entry -> {
 				Users user = entry.getValue();
 				Members member = new Members(user.getUserId(), group.getGroupId(), false, true);
@@ -221,11 +219,11 @@ public class GroupServiceImpl implements GroupService {
 		List<Groups> groups = groupRepo.findByGroupName(keywork);
 		List<GroupDTO> groupDTO = groups.stream().map(group -> modelMapper.map(group, GroupDTO.class))
 				.collect(Collectors.toList());
-		List<Members> listMember = memberRepo.getAllGroupByUser(userId);		
-		try{
+		List<Members> listMember = memberRepo.getAllGroupByUser(userId);
+		try {
 			for (int i = 0; i < groupDTO.size(); i++) {
 				for (int j = 0; j < listMember.size(); j++) {
-					if(listMember.get(j).getGroupId() == groupDTO.get(i).getGroupId()) {
+					if (listMember.get(j).getGroupId() == groupDTO.get(i).getGroupId()) {
 						// groupDTO.remove(i);
 					}
 				}
@@ -234,12 +232,13 @@ public class GroupServiceImpl implements GroupService {
 				List<ContactDTO> listContactDTO = new ArrayList<ContactDTO>();
 				for (int j = 0; j < listContact.size(); j++) {
 					Users user = userRepo.findById(listContact.get(j).getUser().getUserId()).get();
-					ContactDTO contactDTO = new ContactDTO(user.getUserId(), user.getFullName(), user.getEmail(), user.getAvatar(), user.getStudentCode(), listContact.get(j).getContactId());
+					ContactDTO contactDTO = new ContactDTO(user.getUserId(), user.getFullName(), user.getEmail(),
+							user.getAvatar(), user.getStudentCode(), listContact.get(j).getContactId());
 					listContactDTO.add(contactDTO);
 				}
 				groupDTO.get(i).setListContact(listContactDTO);
 			}
-		}catch(Exception e){
+		} catch (Exception e) {
 		}
 		return groupDTO;
 	}
@@ -268,7 +267,7 @@ public class GroupServiceImpl implements GroupService {
 	@Override
 	public List<MemberGroupDTO> getAllGroupByStudent(Long userId) {
 		List<Members> list = memberRepo.getAllGroupByStudent(userId);
-		
+
 		List<MemberGroupDTO> listDTO = new ArrayList();
 		for (int i = 0; i < list.size(); i++) {
 			Groups groupOne = groupRepo.findById(list.get(i).getGroupId()).get();
@@ -300,7 +299,7 @@ public class GroupServiceImpl implements GroupService {
 	@Override
 	public List<MemberGroupDTO> getAllGroupByTeacher(Long userId) {
 		List<Members> list = memberRepo.getAllGroupByTeacher(userId);
-		
+
 		List<MemberGroupDTO> listDTO = new ArrayList();
 		for (int i = 0; i < list.size(); i++) {
 			Groups groupOne = groupRepo.findById(list.get(i).getGroupId()).get();
@@ -380,6 +379,16 @@ public class GroupServiceImpl implements GroupService {
 		Groups group = groupRepo.findById(groupId).get();
 		group.setTotalMember(memberRepo.countMemberInGroup(group.getGroupId()));
 		groupRepo.save(group);
+
+		Long roomId = roomChatRepo.getRoomByGroupId(groupId).get(0).getRoomId();
+		List<Contacts> listContact = contactRepo.getContactByRoomId(roomId);
+		for (Contacts contact : listContact) {
+			if (contact.getUser().getUserId() == userId) {
+				contact.setStatus(false);
+				contactRepo.save(contact);
+				break;
+			}
+		}
 
 	}
 
