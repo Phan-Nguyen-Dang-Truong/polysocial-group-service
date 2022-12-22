@@ -11,13 +11,17 @@ import com.polysocial.entity.Book;
 import com.polysocial.entity.Contacts;
 import com.polysocial.entity.Groups;
 import com.polysocial.entity.Members;
+import com.polysocial.entity.Messages;
 import com.polysocial.entity.RoomChats;
 import com.polysocial.entity.Users;
+import com.polysocial.entity.ViewedStatus;
 import com.polysocial.repository.ContactRepository;
 import com.polysocial.repository.GroupRepository;
 import com.polysocial.repository.MemberRepository;
+import com.polysocial.repository.MessageRepo;
 import com.polysocial.repository.RoomChatRepository;
 import com.polysocial.repository.UserRepository;
+import com.polysocial.repository.ViewedStatusRepo;
 import com.polysocial.service.ExcelService;
 import com.polysocial.service.FileUploadUtil;
 import com.polysocial.service.GroupService;
@@ -53,6 +57,10 @@ public class GroupServiceImpl implements GroupService {
 	private RoomChatRepository roomChatRepo;
 	@Autowired
 	private ContactRepository contactRepo;
+	@Autowired
+	private MessageRepo messageRepo;
+	@Autowired
+	private ViewedStatusRepo viewedStatusRepo;
 
 	@Override
 	public Page<Groups> getAll(Pageable page) {
@@ -123,7 +131,20 @@ public class GroupServiceImpl implements GroupService {
 		contact.setRoom(roomCreate);
 		contact.setUser(userRepo.findById(group.getAdminId()).get());
 		contact.setIsAdmin(true);
-		contactRepo.save(contact);
+		Contacts contactCreated = contactRepo.save(contact);
+
+		Messages message = new Messages();
+		message.setContact(contactCreated);
+		message.setStatus(true);
+		String encodedStringContent = Base64.getEncoder().encodeToString((userRepo.findById(group.getAdminId()).get().getFullName()+" đã tham gia nhóm").getBytes());
+		message.setContent(encodedStringContent);
+		messageRepo.save(message);
+
+		ViewedStatus viewedStatus = new ViewedStatus();
+		viewedStatus.setContactId(contactCreated.getContactId());
+		viewedStatusRepo.save(viewedStatus);
+
+
 		Members member = new Members(group.getAdminId(), groupDTO.getGroupId(), true, true);
 		memberRepo.save(member);
 		return groupDTO;
@@ -198,20 +219,27 @@ public class GroupServiceImpl implements GroupService {
 	@Override
 	public List<GroupDTO> findByKeywork(String keywork, Long userId) {
 		List<Groups> groups = groupRepo.findByGroupName(keywork);
-		System.out.println(groups.size());
 		List<GroupDTO> groupDTO = groups.stream().map(group -> modelMapper.map(group, GroupDTO.class))
 				.collect(Collectors.toList());
-		List<Members> listMember = memberRepo.getAllGroupByUser(userId);
+		List<Members> listMember = memberRepo.getAllGroupByUser(userId);		
 		try{
 			for (int i = 0; i < groupDTO.size(); i++) {
 				for (int j = 0; j < listMember.size(); j++) {
 					if(listMember.get(j).getGroupId() == groupDTO.get(i).getGroupId()) {
-						groupDTO.remove(i);
+						// groupDTO.remove(i);
 					}
 				}
+				Long roomId = roomChatRepo.getRoomByGroupId(groupDTO.get(i).getGroupId()).get(0).getRoomId();
+				List<Contacts> listContact = contactRepo.getContactByRoomId(roomId);
+				List<ContactDTO> listContactDTO = new ArrayList<ContactDTO>();
+				for (int j = 0; j < listContact.size(); j++) {
+					Users user = userRepo.findById(listContact.get(j).getUser().getUserId()).get();
+					ContactDTO contactDTO = new ContactDTO(user.getUserId(), user.getFullName(), user.getEmail(), user.getAvatar(), user.getStudentCode(), listContact.get(j).getContactId());
+					listContactDTO.add(contactDTO);
+				}
+				groupDTO.get(i).setListContact(listContactDTO);
 			}
 		}catch(Exception e){
-
 		}
 		return groupDTO;
 	}
