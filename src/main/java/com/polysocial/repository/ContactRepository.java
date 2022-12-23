@@ -13,5 +13,8 @@ public interface ContactRepository extends JpaRepository<Contacts, Long> {
 
     @Query("SELECT c FROM Contacts c WHERE c.room.roomId = ?1 and c.status = 1")
     List<Contacts> getContactByRoomId(Long roomId);
+
+    @Query("SELECT c FROM Contacts c WHERE c.room.roomId = ?1 and c.status = 0")
+    Contacts getContactByRoomIdCheck(Long roomId);
     
 }

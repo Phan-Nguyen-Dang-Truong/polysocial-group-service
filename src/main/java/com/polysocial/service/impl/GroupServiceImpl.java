@@ -347,9 +347,10 @@ public class GroupServiceImpl implements GroupService {
 		List<Members> listMember = memberRepo.getUserJoin(groupId);
 		List<MemberDTO2> listUser = new ArrayList();
 		Long roomId = roomChatRepo.getRoomByGroupId(groupId).get(0).getRoomId();
-		List<Contacts> contact = contactRepo.getContactByRoomId(roomId);
+	
+		Contacts contact = contactRepo.getContactByRoomIdCheck(roomId);
 		for (int i = 0; i < listMember.size(); i++) {
-			if(contact.get(i).getStatus() == false) continue;
+			if(contact.getUser().getUserId() == listMember.get(i).getUserId())continue;
 			Users user = userRepo.findById(listMember.get(i).getUserId()).get();
 			MemberDTO2 userDTO = modelMapper.map(user, MemberDTO2.class);
 			listUser.add(userDTO);
