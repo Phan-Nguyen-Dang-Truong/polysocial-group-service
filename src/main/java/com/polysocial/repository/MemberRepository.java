@@ -45,7 +45,7 @@ public interface MemberRepository extends JpaRepository<Members, Long>{
 
 	@Modifying
 	@Transactional
-	@Query("DELETE FROM Members o WHERE o.groupId =?1 and o.userId =?2")
+	@Query("UPDATE Members o SET o.confirm = 0 WHERE o.groupId =?1 and o.userId =?2")
 	void memberLeaveGroup(Long groupId, Long userId);
 
 	@Query("SELECT o FROM Members o WHERE o.userId =?1 and o.confirm=1")
