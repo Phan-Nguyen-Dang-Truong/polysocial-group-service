@@ -346,8 +346,11 @@ public class GroupServiceImpl implements GroupService {
 	public List<MemberDTO2> getAllMemberJoinGroupFalse(Long groupId) {
 		List<Members> listMember = memberRepo.getUserJoin(groupId);
 		List<MemberDTO2> listUser = new ArrayList();
-		for (Members member : listMember) {
-			Users user = userRepo.findById(member.getUserId()).get();
+		Long roomId = roomChatRepo.getRoomByGroupId(groupId).get(0).getRoomId();
+		List<Contacts> contact = contactRepo.getContactByRoomId(roomId);
+		for (int i = 0; i < listMember.size(); i++) {
+			if(contact.get(i).getStatus() == false) continue;
+			Users user = userRepo.findById(listMember.get(i).getUserId()).get();
 			MemberDTO2 userDTO = modelMapper.map(user, MemberDTO2.class);
 			listUser.add(userDTO);
 		}
@@ -396,7 +399,7 @@ public class GroupServiceImpl implements GroupService {
 				break;
 			}
 		}
-		
+
 
 	}
 
