@@ -266,7 +266,7 @@ public class GroupController {
 		}
 	}
 
-	@DeleteMapping(GroupAPI.API_LEAVE_GROUP)
+	@PutMapping(GroupAPI.API_LEAVE_GROUP)
 	public ResponseEntity leaveGroup(@RequestParam Long groupId, @RequestParam Long userId) {
 		try {
 			groupBusiness.memberLeaveGroup(groupId, userId);
