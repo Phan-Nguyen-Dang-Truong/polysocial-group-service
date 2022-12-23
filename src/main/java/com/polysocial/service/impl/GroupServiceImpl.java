@@ -356,10 +356,11 @@ public class GroupServiceImpl implements GroupService {
 			if (contact != null) {
 				if (contact.getUser().getUserId() == listMember.get(i).getUserId())
 					continue;
-				Users user = userRepo.findById(listMember.get(i).getUserId()).get();
-				MemberDTO2 userDTO = modelMapper.map(user, MemberDTO2.class);
-				listUser.add(userDTO);
 			}
+			Users user = userRepo.findById(listMember.get(i).getUserId()).get();
+			MemberDTO2 userDTO = modelMapper.map(user, MemberDTO2.class);
+			listUser.add(userDTO);
+
 		}
 		return listUser;
 
