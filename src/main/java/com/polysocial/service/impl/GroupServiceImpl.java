@@ -307,6 +307,8 @@ public class GroupServiceImpl implements GroupService {
 			MemberGroupDTO member = new MemberGroupDTO(groupOne.getGroupId(), groupOne.getName(),
 					list.get(i).getIsTeacher(), groupOne.getTotalMember(), groupOne.getAvatar(), roomChatId);
 			member.setClassName(groupOne.getClassName());
+			member.setDescription(groupOne.getDescription());
+			member.setCreatedDate(groupOne.getCreatedDate());
 			try {
 				Long roomId = roomChatRepo.getRoomByGroupId(groupOne.getGroupId()).get(0).getRoomId();
 				List<Contacts> contact = contactRepo.getContactByRoomId(roomId);
