@@ -1,5 +1,7 @@
 package com.polysocial.service.impl;
 
+import java.time.ZoneId;
+import java.util.Date;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -9,17 +11,24 @@ import org.springframework.stereotype.Service;
 
 import com.polysocial.dto.ExercisesDTO;
 import com.polysocial.dto.ExercisesDetailDTO;
+import com.polysocial.dto.NotificationsDTO;
 import com.polysocial.dto.TaskExDTO;
 import com.polysocial.entity.Exercises;
 import com.polysocial.entity.Members;
 import com.polysocial.entity.TaskEx;
 import com.polysocial.entity.TaskFile;
+import com.polysocial.entity.Users;
+import com.polysocial.notification.ContentNotifications;
 import com.polysocial.repository.ExercisesRepository;
 import com.polysocial.repository.GroupRepository;
 import com.polysocial.repository.MemberRepository;
 import com.polysocial.repository.TaskExRepository;
 import com.polysocial.repository.TaskFileRepository;
+import com.polysocial.repository.UserRepository;
 import com.polysocial.service.ExercisesService;
+import com.polysocial.service.NotificationsService;
+import com.polysocial.type.TypeNotifications;
+import com.polysocial.utils.SendMailDeadline;
 
 @Service
 public class ExercisesServiceImpl implements ExercisesService {
@@ -42,14 +51,24 @@ public class ExercisesServiceImpl implements ExercisesService {
     @Autowired
     private MemberRepository memberRepo;
 
+    @Autowired
+    private SendMailDeadline sendMailDeadline;
+
+    @Autowired
+    private UserRepository userRepo;
+
+    @Autowired
+    private NotificationsService notificationsService;
+
     @Override
     public ExercisesDTO createOne(ExercisesDTO ex) {
         Exercises exercise = modelMapper.map(ex, Exercises.class);
         exercise.setGroup(groupRepo.findById(ex.getGroupId()).get());
         List<Members> listMember = memberRepo.getMemberInGroup(exercise.getGroup().getGroupId());
         Exercises exercises = exercisesRepo.save(exercise);
-        for(int i = 0; i< listMember.size();i++){
-            TaskExDTO taskExDTO = new TaskExDTO(exercise.getExId(), listMember.get(i).getUserId(), exercise.getGroup().getGroupId());
+        for (int i = 0; i < listMember.size(); i++) {
+            TaskExDTO taskExDTO = new TaskExDTO(exercise.getExId(), listMember.get(i).getUserId(),
+                    exercise.getGroup().getGroupId());
             Members member = new Members(listMember.get(i).getUserId(), exercise.getGroup().getGroupId(), false, true);
             TaskEx taskEx = modelMapper.map(taskExDTO, TaskEx.class);
             taskEx.setMember(member);
@@ -59,26 +78,26 @@ public class ExercisesServiceImpl implements ExercisesService {
         }
         ExercisesDTO exercisesDTO = modelMapper.map(exercises, ExercisesDTO.class);
 
-        return exercisesDTO ;
+        return exercisesDTO;
     }
 
     @Override
-    public ExercisesDTO updateOne (ExercisesDTO exercise) {
+    public ExercisesDTO updateOne(ExercisesDTO exercise) {
         Exercises exercises = modelMapper.map(exercise, Exercises.class);
         exercises.setExId(exercise.getExId());
         ExercisesDTO exercisesDTO = modelMapper.map(exercisesRepo.save(exercises), ExercisesDTO.class);
-        return exercisesDTO ;
+        return exercisesDTO;
     }
 
     @Override
     public void deleteOne(Long exId) {
         List<TaskEx> listTaskEx = taskExRepo.findByExerciseExId(exId);
-        try{
-            for(int i = 0; i< listTaskEx.size();i++){
+        try {
+            for (int i = 0; i < listTaskEx.size(); i++) {
                 taskFileRepo.deleteByTaskTaskId(listTaskEx.get(i).getTaskId());
                 taskExRepo.deleteById(listTaskEx.get(i).getTaskId());
-            }   
-        }catch(Exception e){
+            }
+        } catch (Exception e) {
             e.printStackTrace();
         }
         exercisesRepo.deleteById(exId);
@@ -86,15 +105,17 @@ public class ExercisesServiceImpl implements ExercisesService {
 
     @Override
     public List<ExercisesDTO> getAllExercisesEndDate(Long groupId) {
-        List<Exercises> exercises =  exercisesRepo.getAllEndDate(groupId);
-        List<ExercisesDTO> exercisesDTO = exercises.stream().map(exercise -> modelMapper.map(exercise, ExercisesDTO.class)).collect(Collectors.toList());
+        List<Exercises> exercises = exercisesRepo.getAllEndDate(groupId);
+        List<ExercisesDTO> exercisesDTO = exercises.stream()
+                .map(exercise -> modelMapper.map(exercise, ExercisesDTO.class)).collect(Collectors.toList());
         return exercisesDTO;
     }
 
     @Override
     public List<ExercisesDTO> getAllExercises(Long groupId) {
-        List<Exercises> exercises =  exercisesRepo.getAllExercises(groupId);
-        List<ExercisesDTO> exercisesDTO = exercises.stream().map(exercise -> modelMapper.map(exercise, ExercisesDTO.class)).collect(Collectors.toList());
+        List<Exercises> exercises = exercisesRepo.getAllExercises(groupId);
+        List<ExercisesDTO> exercisesDTO = exercises.stream()
+                .map(exercise -> modelMapper.map(exercise, ExercisesDTO.class)).collect(Collectors.toList());
         return exercisesDTO;
     }
 
@@ -106,16 +127,66 @@ public class ExercisesServiceImpl implements ExercisesService {
         ExercisesDetailDTO exercisesDTO = modelMapper.map(exercises, ExercisesDetailDTO.class);
         exercisesDTO.setTaskFileId(taskFileId);
         Exercises ex = exercisesRepo.findById(exId).get();
-        try{
+        try {
             TaskEx taskEx = taskExRepo.findByExIdAndUser(exId, userId);
             TaskFile taskFile = taskFileRepo.findByTaskEx(taskEx.getTaskId());
             exercisesDTO.setUrl(taskFile.getUrl());
             exercisesDTO.setIsSubmit(true);
-        }catch(Exception e){
+        } catch (Exception e) {
             e.printStackTrace();
             exercisesDTO.setIsSubmit(false);
         }
         return exercisesDTO;
     }
-    
+
+    @Override
+    public List<ExercisesDTO> checkEndDate() {
+        List<Exercises> exercises = exercisesRepo.getAll();
+        Date date1 = new Date();
+        for (int i = 0; i < exercises.size(); i++) {
+            // conver localdatetime to date
+            Date date2 = Date.from(exercises.get(i).getEndDate().atZone(ZoneId.systemDefault()).toInstant());
+            if (date2.after(date1) == false) {
+                exercises.get(i).setStatus(false);
+                List<Members> members = memberRepo.getMemberInGroup(exercises.get(i).getGroup().getGroupId());
+                for (int j = 0; j < members.size(); j++) {
+                    NotificationsDTO notificationsDTO = new NotificationsDTO(
+                            String.format(ContentNotifications.NOTI_DEADLINE_END, exercises.get(i).getContent(),
+                                    groupRepo.findById(exercises.get(i).getGroup().getGroupId()).get().getName()),
+                            TypeNotifications.NOTI_TYPE_DEADLINE_END, members.get(j).getUserId());
+                    notificationsService.createNoti(notificationsDTO);
+                }
+               
+            }
+        }
+        exercisesRepo.saveAll(exercises);
+        List<ExercisesDTO> exercisesDTO = exercises.stream()
+                .map(exercise -> modelMapper.map(exercise, ExercisesDTO.class)).collect(Collectors.toList());
+        return exercisesDTO;
+    }
+
+    @Override
+    public List<ExercisesDTO> sendNotiDeadline() {
+        List<Exercises> exercises = exercisesRepo.getAll();
+        for (int i = 0; i < exercises.size(); i++) {
+            Long groupId = exercises.get(i).getGroup().getGroupId();
+            List<Members> members = memberRepo.getMemberInGroup(groupId);
+            for (int j = 0; j < members.size(); j++) {
+                Users user = userRepo.findById(members.get(j).getUserId()).get();
+                sendMailDeadline.sendMail(user.getEmail(), user.getFullName(),
+                        groupRepo.findById(groupId).get().getName(), exercises.get(i).getContent(),
+                        exercises.get(i).getEndDate() + "");
+                NotificationsDTO notificationsDTO = new NotificationsDTO(
+                        String.format(ContentNotifications.NOTI_DEADLINE, exercises.get(i).getContent(),
+                                groupRepo.findById(groupId).get().getName()),
+                        TypeNotifications.NOTI_DEADLINE, members.get(j).getUserId());
+                notificationsService.createNoti(notificationsDTO);
+            }
+        }
+        List<ExercisesDTO> exercisesDTO = exercises.stream()
+                .map(exercise -> modelMapper.map(exercise, ExercisesDTO.class)).collect(Collectors.toList());
+
+        return exercisesDTO;
+    }
+
 }

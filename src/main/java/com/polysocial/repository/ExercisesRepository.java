@@ -27,5 +27,8 @@ public interface ExercisesRepository extends JpaRepository<Exercises, Long> {
     @Query("SELECT e FROM Exercises e WHERE e.group.groupId = ?1")
     List<Exercises> getAllExercises(Long groupId);
 
+    @Query("SELECT e FROM Exercises e WHERE e.status = 1")
+    List<Exercises> getAll();
+
    
 }

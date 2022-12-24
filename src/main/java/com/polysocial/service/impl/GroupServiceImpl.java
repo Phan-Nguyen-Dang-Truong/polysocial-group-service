@@ -397,13 +397,6 @@ public class GroupServiceImpl implements GroupService {
 			if (contact.getUser().getUserId() == userId) {
 				contact.setStatus(false);
 				contactRepo.save(contact);
-				Messages message = new Messages();
-				message.setContact(contact);
-				message.setStatus(true);
-				String encodedStringContent = Base64.getEncoder().encodeToString(
-						(userRepo.findById(userId).get().getFullName() + " đã rời khỏi nhóm").getBytes());
-				message.setContent(encodedStringContent);
-				messageRepo.save(message);
 				break;
 			}
 		}

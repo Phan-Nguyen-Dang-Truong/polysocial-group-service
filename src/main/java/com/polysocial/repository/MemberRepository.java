@@ -53,4 +53,6 @@ public interface MemberRepository extends JpaRepository<Members, Long>{
 
 	@Query("SELECT count(o) FROM Members o WHERE o.groupId =?1 and o.confirm=1")
 	Long countMemberInGroup(Long groupId);
+
+	List<Members> findByGroupId(Long groupId);
 }

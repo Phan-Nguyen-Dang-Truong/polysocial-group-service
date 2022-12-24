@@ -20,4 +20,7 @@ public interface ExercisesService {
 
     ExercisesDetailDTO getOneExercises(Long exId, Long userId);
 
+    List<ExercisesDTO> checkEndDate();
+
+    List<ExercisesDTO> sendNotiDeadline();
 }
