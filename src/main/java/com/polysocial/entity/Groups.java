@@ -16,6 +16,7 @@ import java.util.Objects;
 @AllArgsConstructor
 @RequiredArgsConstructor
 @Entity
+@Table(name = "`Groups`")
 public class Groups implements Serializable {
 
 	@Id
