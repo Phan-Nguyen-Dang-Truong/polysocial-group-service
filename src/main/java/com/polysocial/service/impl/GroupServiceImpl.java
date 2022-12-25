@@ -113,7 +113,7 @@ public class GroupServiceImpl implements GroupService {
 	@Override
 	public GroupDTO createGroup(GroupDTO group) {
 		Groups groupEntity = modelMapper.map(group, Groups.class);
-		groupEntity.setTotalMember(0L);
+		groupEntity.setTotalMember(1L);
 		Groups groups = groupRepo.save(groupEntity);
 		GroupDTO groupDTO = modelMapper.map(groups, GroupDTO.class);
 		groupDTO.setGroupId(groups.getGroupId());

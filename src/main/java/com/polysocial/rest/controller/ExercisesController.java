@@ -102,6 +102,7 @@ public class ExercisesController {
         try {
             return ResponseEntity.ok(exercisesService.sendNotiDeadline());
         } catch (Exception ex) {
+            ex.printStackTrace();
             return new ResponseEntity(HttpStatus.BAD_REQUEST.toString(), HttpStatus.BAD_REQUEST);
         }
     }

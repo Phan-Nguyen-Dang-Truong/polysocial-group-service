@@ -21,4 +21,6 @@ public class TaskAPI {
 
     public static final String API_GET_ALL_TASK_EX_BY_EX = "/api/task/get-task-by-ex";
 
+    public static final String API_GET_ALL_TASK_EX_BY_EX_ID = "/api/task/get-task-by-exId";
+
 }

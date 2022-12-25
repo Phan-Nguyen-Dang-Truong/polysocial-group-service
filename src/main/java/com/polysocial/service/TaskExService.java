@@ -4,6 +4,7 @@ import java.util.List;
 
 import com.polysocial.dto.TaskExDTO;
 import com.polysocial.dto.TaskExDetailDTO;
+import com.polysocial.dto.TaskExDetailGroup;
 import com.polysocial.entity.TaskEx;
 
 public interface TaskExService {
@@ -19,4 +20,6 @@ public interface TaskExService {
     List<TaskExDetailDTO> getAllTaskExByUserId(Long userId);
 
     List<TaskExDTO> getAllTaskExByEx(Long exId);
+
+    TaskExDetailGroup countTaskEx(Long exId);
 }

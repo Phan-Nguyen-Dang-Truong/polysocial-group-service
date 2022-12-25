@@ -19,6 +19,7 @@ import com.cloudinary.Cloudinary;
 import com.cloudinary.utils.ObjectUtils;
 import com.polysocial.dto.TaskExDTO;
 import com.polysocial.dto.TaskExDetailDTO;
+import com.polysocial.dto.TaskExDetailGroup;
 import com.polysocial.entity.FileSave;
 import com.polysocial.entity.TaskEx;
 import com.polysocial.repository.TaskExRepository;
@@ -83,6 +84,14 @@ public class TaskExServiceImpl implements TaskExService {
             taskExDTOs.add(taskExDTO);
         }
         return taskExDTOs;
+    }
+
+    @Override
+    public TaskExDetailGroup countTaskEx(Long exId) {
+        TaskExDetailGroup taskExDetailGroup = new TaskExDetailGroup();
+        taskExDetailGroup.setCountTaskSubmit(taskExRepository.countTaskEx(exId));
+        taskExDetailGroup.setCountTaskNotSubmit(taskExRepository.countTaskExNotSubmit(exId));
+        return taskExDetailGroup;
     }
 
   
