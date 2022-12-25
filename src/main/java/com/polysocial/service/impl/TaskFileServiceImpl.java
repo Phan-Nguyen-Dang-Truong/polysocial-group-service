@@ -1,5 +1,6 @@
 package com.polysocial.service.impl;
 
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -50,6 +51,7 @@ public class TaskFileServiceImpl implements TaskFileService {
 	@Override
 	public void deleteTaskFile(Long taskFileId) {
 		taskFileRepository.deleteById(taskFileId);
+		
 	}
 
 	@Override
@@ -60,6 +62,9 @@ public class TaskFileServiceImpl implements TaskFileService {
 		if(task_file != null )  return null;
 		String type = url.substring(url.lastIndexOf(".") + 1);
 		TaskFile taskFiles = new TaskFile(url, type, taskEx);
+		LocalDateTime now = LocalDateTime.now();
+		taskEx.setUpdatedDate(now);
+		taskExRepository.save(taskEx);
 		return taskFileRepository.save(taskFiles);
 	}
 
@@ -72,15 +77,15 @@ public class TaskFileServiceImpl implements TaskFileService {
 
 	@Override
 	public TaskFile updateFile(TaskFileCreateDTO taskFile) {
-		System.out.println("123");
 		String url = taskFile.getPath();
-		System.out.println(taskFile.getExId() +"-"+ taskFile.getUserId() +"-"+ taskFile.getGroupId());
 		TaskEx taskEx = taskExRepository.findByExIdAndUserIdAndGroupId(taskFile.getExId(), taskFile.getUserId(), taskFile.getGroupId());
 		String type = url.substring(url.lastIndexOf(".") + 1);
 		TaskFile taskFiles = new TaskFile(url, type, taskEx);
 		Long idTaskFile = taskFileRepository.findByTaskEx(taskEx.getTaskId()).getTaskFileId();
-		System.out.println(idTaskFile);
 		taskFiles.setTaskFileId(idTaskFile);
+		LocalDateTime now = LocalDateTime.now();
+		taskEx.setUpdatedDate(now);
+		taskExRepository.save(taskEx);
 		return taskFileRepository.save(taskFiles);
 	}
 

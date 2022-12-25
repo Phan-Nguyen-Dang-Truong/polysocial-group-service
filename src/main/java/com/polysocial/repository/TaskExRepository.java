@@ -33,4 +33,11 @@ public interface TaskExRepository extends JpaRepository<TaskEx, Long> {
     @Query("SELECT o FROM TaskEx o WHERE o.member.userId =?1")
     List<TaskEx> findByUserId(Long userId);
 
+    //count
+    @Query("SELECT COUNT(o) FROM TaskEx o WHERE o.exercise.exId = ?1 and o.updatedDate is not null")
+    int countTaskEx(Long exId);
+
+    @Query("SELECT COUNT(o) FROM TaskEx o WHERE o.exercise.exId = ?1  and o.updatedDate is null")
+    int countTaskExNotSubmit(Long exId); 
+
 }
