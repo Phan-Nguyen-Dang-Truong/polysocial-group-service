@@ -122,18 +122,22 @@ public class ExercisesServiceImpl implements ExercisesService {
     @Override
     public ExercisesDetailDTO getOneExercises(Long exId, Long userId) {
         Exercises exercises = exercisesRepo.findById(exId).get();
-        Long taskId = taskExRepo.findByExIdAndUser(exId, userId).getTaskId();
-        Long taskFileId = taskFileRepo.findByTaskEx(taskId).getTaskFileId();
         ExercisesDetailDTO exercisesDTO = modelMapper.map(exercises, ExercisesDetailDTO.class);
-        exercisesDTO.setTaskFileId(taskFileId);
-        Exercises ex = exercisesRepo.findById(exId).get();
+
+        try {
+            Long taskId = taskExRepo.findByExIdAndUser(exId, userId).getTaskId();
+            Long taskFileId = taskFileRepo.findByTaskEx(taskId).getTaskFileId();
+            exercisesDTO.setTaskFileId(taskFileId);
+            Exercises ex = exercisesRepo.findById(exId).get();
+        } catch (Exception e) {
+        }
         try {
             TaskEx taskEx = taskExRepo.findByExIdAndUser(exId, userId);
             TaskFile taskFile = taskFileRepo.findByTaskEx(taskEx.getTaskId());
             exercisesDTO.setUrl(taskFile.getUrl());
             exercisesDTO.setIsSubmit(true);
         } catch (Exception e) {
-            e.printStackTrace();
+            // e.printStackTrace();
             exercisesDTO.setIsSubmit(false);
         }
         return exercisesDTO;
@@ -156,7 +160,7 @@ public class ExercisesServiceImpl implements ExercisesService {
                             TypeNotifications.NOTI_TYPE_DEADLINE_END, members.get(j).getUserId());
                     notificationsService.createNoti(notificationsDTO);
                 }
-               
+
             }
         }
         exercisesRepo.saveAll(exercises);

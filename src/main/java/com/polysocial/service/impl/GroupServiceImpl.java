@@ -186,10 +186,13 @@ public class GroupServiceImpl implements GroupService {
 			Groups group = modelMapper.map(groupRepo.findById(groupId), Groups.class);
 			map.entrySet().forEach(entry -> {
 				Users user = entry.getValue();
-				Members member = new Members(user.getUserId(), group.getGroupId(), false, true);
-				memberRepo.save(member);
-				Contacts contact = new Contacts(user, roomChatRepo.getRoomByGroupId(group.getGroupId()).get(0));
-				contactRepo.save(contact);
+				if (user.getRole().getRoleId() == 2) {
+					Members member = new Members(user.getUserId(), group.getGroupId(), false, true);
+					memberRepo.save(member);
+					Contacts contact = new Contacts(user, roomChatRepo.getRoomByGroupId(group.getGroupId()).get(0));
+					contactRepo.save(contact);
+				}
+
 			});
 			List<Members> listMember = memberRepo.getMemberInGroup(groupId);
 			group.setTotalMember(Long.parseLong(listMember.size() + ""));

@@ -55,4 +55,5 @@ public interface MemberRepository extends JpaRepository<Members, Long>{
 	Long countMemberInGroup(Long groupId);
 
 	List<Members> findByGroupId(Long groupId);
+
 }
