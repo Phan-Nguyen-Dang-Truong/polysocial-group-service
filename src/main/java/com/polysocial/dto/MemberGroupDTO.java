@@ -9,13 +9,17 @@ import com.fasterxml.jackson.annotation.JsonInclude;
 import com.polysocial.entity.Contacts;
 import com.polysocial.entity.RoomChats;
 
+import lombok.AllArgsConstructor;
 import lombok.Getter;
+import lombok.NoArgsConstructor;
 import lombok.Setter;
 
 @Getter
 @Setter
 @JsonIgnoreProperties(ignoreUnknown = true)
 @JsonInclude(JsonInclude.Include.NON_NULL)
+@AllArgsConstructor
+@NoArgsConstructor
 public class MemberGroupDTO implements Serializable{
     private Long groupId;
     private String groupName;
